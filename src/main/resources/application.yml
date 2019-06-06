@@ -1,0 +1,38 @@
+server:
+  port: @server.port@
+management:
+  security:
+    flag: false
+  metrics:
+    export:
+      statsd:
+        flavor: etsy
+        enabled: false
+spring:
+  application:
+    name: @project.name@
+  output:
+    ansi:
+      enabled: always
+info:
+  version: @project.version@
+  stage: dev
+
+kafka:
+  bootstrap.servers: "localhost:29092"
+  topic:
+    webhook:
+      forward: webhook-forward
+      second.retry: webhook-second-retry
+      first.retry: webhook-first-retry
+  ssl:
+    enable: false
+    keystore-location: src/main/resources/cert/kenny-k.struzhkin.p12
+    keystore-password: kenny
+    key-password: kenny
+    server-password: kenny12
+    server-keystore-location: src/
+
+merchant:
+  callback:
+    timeout: 10
