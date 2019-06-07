@@ -25,6 +25,7 @@ kafka:
       forward: webhook-forward
       second.retry: webhook-second-retry
       first.retry: webhook-first-retry
+      dead.letter.queue: dead-letter-queue
   ssl:
     enable: false
     keystore-location: src/main/resources/cert/kenny-k.struzhkin.p12

@@ -6,4 +6,6 @@ public interface WebHookDao {
 
     void commit(Webhook webHook);
 
+    boolean isCommitParent(Webhook webHook);
+
 }
