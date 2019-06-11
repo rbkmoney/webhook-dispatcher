@@ -2,7 +2,6 @@ package com.rbkmoney.webhook.dispatcher.listener;
 
 import com.rbkmoney.webhook.dispatcher.Webhook;
 import com.rbkmoney.webhook.dispatcher.handler.RetryWebHookHandler;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -11,18 +10,23 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class FirstRetryWebHookListener {
 
-    private static final long TIMEOUT = 30L;
-    private final RetryWebHookHandler handler;
-
-    @Value("${kafka.topic.webhook.second.retry}")
+    private long timeout;
     private String postponedTopic;
+    private RetryWebHookHandler handler;
+
+    public FirstRetryWebHookListener(@Value("${kafka.topic.webhook.second.retry}") String postponedTopic,
+                                     @Value("${retry.first.seconds}") long timeout,
+                                     RetryWebHookHandler handler) {
+        this.postponedTopic = postponedTopic;
+        this.timeout = timeout;
+        this.handler = handler;
+    }
 
     @KafkaListener(topics = "${kafka.topic.webhook.first.retry}", containerFactory = "kafkaRetryListenerContainerFactory")
     public void listen(Webhook webhook, Acknowledgment acknowledgment) {
-        handler.handle(postponedTopic, acknowledgment, webhook, TIMEOUT);
+        handler.handle(postponedTopic, acknowledgment, webhook, timeout);
     }
 
 }

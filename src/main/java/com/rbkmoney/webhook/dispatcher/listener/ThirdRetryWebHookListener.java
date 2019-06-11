@@ -9,21 +9,26 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
-//@Slf4j
-//@Component
-//@RequiredArgsConstructor
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class ThirdRetryWebHookListener {
 
-//    private static final long TIMEOUT = 1800L;
-//
-//    private final RetryWebHookHandler handler;
-//
-//    @Value("${kafka.topic.webhook.last.retry}")
-//    private String postponedTopic;
-//
-//    @KafkaListener(topics = "${kafka.topic.webhook.third.retry}", containerFactory = "kafkaListenerContainerFactory")
-//    public void listen(Webhook webhook, Acknowledgment acknowledgment) {
-//        handler.handle(postponedTopic, acknowledgment, webhook, TIMEOUT);
-//    }
+    private long timeout;
+    private String postponedTopic;
+    private RetryWebHookHandler handler;
+
+    public ThirdRetryWebHookListener(@Value("${kafka.topic.webhook.last.retry}") String postponedTopic,
+                                     @Value("${retry.third.seconds}") long timeout,
+                                     RetryWebHookHandler handler) {
+        this.postponedTopic = postponedTopic;
+        this.timeout = timeout;
+        this.handler = handler;
+    }
+
+    @KafkaListener(topics = "${kafka.topic.webhook.third.retry}", containerFactory = "kafkaThirdRetryListenerContainerFactory")
+    public void listen(Webhook webhook, Acknowledgment acknowledgment) {
+        handler.handle(postponedTopic, acknowledgment, webhook, timeout);
+    }
 
 }

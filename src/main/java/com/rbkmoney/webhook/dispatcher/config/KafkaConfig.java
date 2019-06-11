@@ -69,14 +69,27 @@ public class KafkaConfig {
     }
 
     @Bean
-    @Autowired
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
         return createFactory(consumerFactory);
     }
 
     @Bean
-    @Autowired
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
+        return createFactory(consumerFactory);
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaSecondRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
+        return createFactory(consumerFactory);
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaThirdRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
+        return createFactory(consumerFactory);
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaLastRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
         return createFactory(consumerFactory);
     }
 

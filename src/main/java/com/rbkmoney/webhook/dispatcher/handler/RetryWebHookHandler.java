@@ -18,7 +18,7 @@ public class RetryWebHookHandler {
     private static final long MILLIS = 500L;
 
     public void handle(String topic, Acknowledgment acknowledgment, Webhook webhook, Long timeout) {
-        log.info("RetryWebHookHandler webhook: {}", webhook);
+        log.debug("RetryWebHookHandler webhook: {}", webhook);
         try {
             if (timeDispatchFilter.filter(webhook, timeout)) {
                 handler.handle(topic, webhook);
