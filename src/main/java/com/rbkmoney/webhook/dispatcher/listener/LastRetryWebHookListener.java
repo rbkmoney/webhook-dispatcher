@@ -12,15 +12,16 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FirstRetryWebHookListener {
+public class LastRetryWebHookListener {
 
-    private static final long TIMEOUT = 30L;
+    private static final long TIMEOUT = 6400L;
+
     private final RetryWebHookHandler handler;
 
-    @Value("${kafka.topic.webhook.second.retry}")
+    @Value("${kafka.topic.webhook.last.retry}")
     private String postponedTopic;
 
-    @KafkaListener(topics = "${kafka.topic.webhook.first.retry}", containerFactory = "kafkaRetryListenerContainerFactory")
+    @KafkaListener(topics = "${kafka.topic.webhook.last.retry}", containerFactory = "kafkaListenerContainerFactory")
     public void listen(Webhook webhook, Acknowledgment acknowledgment) {
         handler.handle(postponedTopic, acknowledgment, webhook, TIMEOUT);
     }

@@ -13,15 +13,15 @@ public class MapWebHookDaoImpl implements WebHookDao {
 
     @Override
     public void commit(Webhook webHook) {
-        map.put(generateKey(webHook), true);
+        if (webHook.source_id == null) {
+            throw new NullPointerException();
+        }
+        map.put(webHook.source_id + webHook.event_id, true);
     }
 
     @Override
     public boolean isCommitParent(Webhook webHook) {
-        return map.get(generateKey(webHook));
+        return webHook.event_id == 0 || map.containsKey(webHook.source_id + webHook.parent_event_id);
     }
 
-    private String generateKey(Webhook webHook) {
-        return webHook.source_id + webHook.event_id;
-    }
 }

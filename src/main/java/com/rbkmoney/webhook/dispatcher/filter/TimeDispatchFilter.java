@@ -9,7 +9,7 @@ import java.time.Instant;
 public class TimeDispatchFilter {
 
     public Boolean filter(Webhook webhook, long timeout) {
-        String createdAt = webhook.getCreatedAt();
-        return Instant.parse(createdAt).plusSeconds(timeout).toEpochMilli() > Instant.now().toEpochMilli();
+        return Instant.now().toEpochMilli() - Instant.parse(webhook.getCreatedAt()).toEpochMilli() > timeout * 1000;
     }
+
 }

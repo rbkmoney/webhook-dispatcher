@@ -23,9 +23,11 @@ kafka:
   topic:
     webhook:
       forward: webhook-forward
-      second.retry: webhook-second-retry
       first.retry: webhook-first-retry
-      dead.letter.queue: dead-letter-queue
+      second.retry: webhook-second-retry
+      third.retry: webhook-third-retry
+      last.retry: webhook-last-retry
+      dead.letter.queue: webhook-dead-letter-queue
   ssl:
     enable: false
     keystore-location: src/main/resources/cert/kenny-k.struzhkin.p12
@@ -37,3 +39,5 @@ kafka:
 merchant:
   callback:
     timeout: 10
+
+retry.dead.time.hours: 24

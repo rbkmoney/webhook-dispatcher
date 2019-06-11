@@ -9,7 +9,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.thrift.TBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +17,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.LoggingErrorHandler;
 
 import java.io.File;
@@ -56,6 +56,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
         props.put(MAX_POLL_RECORDS_CONFIG, 1);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         sslConfigure(props);
         return props;
     }
@@ -70,9 +71,21 @@ public class KafkaConfig {
     @Bean
     @Autowired
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
+        return createFactory(consumerFactory);
+    }
+
+    @Bean
+    @Autowired
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
+        return createFactory(consumerFactory);
+    }
+
+    private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> createFactory(ConsumerFactory<String, Webhook> consumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, Webhook> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setErrorHandler(new LoggingErrorHandler());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        factory.setConcurrency(1);
         return factory;
     }
 
