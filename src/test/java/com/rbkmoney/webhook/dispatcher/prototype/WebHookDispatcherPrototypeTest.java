@@ -78,7 +78,7 @@ public class WebHookDispatcherPrototypeTest {
         event = firstRetryQueue.poll();
         checkAndCommit(event, secondRetryQueue);
 
-        Assert.assertEquals(secondRetryQueue.size(), 3);
+        Assert.assertEquals(3, secondRetryQueue.size());
 
         iterateThreeMessage(secondRetryQueue, thirdRetryQueue);
 
