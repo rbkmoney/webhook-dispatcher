@@ -56,7 +56,6 @@ public class WebHookDispatcherServiceImplTest {
         webHookDispatcherService.dispatch(webhook);
     }
 
-
     @Test
     public void dispatch() throws IOException {
         stubFor(WireMock.post(urlEqualTo("/test"))

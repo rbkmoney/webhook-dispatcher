@@ -1,25 +1,27 @@
 package com.rbkmoney.webhook.dispatcher.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Configuration
 public class HttpClientConfig {
 
     @Bean
-    public HttpClient httpClient(@Value("${merchant.callback.timeout}") int timeout) {
-        HttpClientBuilder httpBuilder = HttpClientBuilder.create();
-        return httpBuilder
-                .setConnectionTimeToLive(10000L, TimeUnit.MILLISECONDS)
+    public CloseableHttpClient httpClient(@Value("${merchant.callback.timeout}") int timeout) {
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(1000)
+                .setConnectionRequestTimeout(1000)
+                .setSocketTimeout(1000)
                 .build();
-
+        return HttpClientBuilder.create()
+                .setDefaultRequestConfig(config)
+                .build();
     }
 
 }
