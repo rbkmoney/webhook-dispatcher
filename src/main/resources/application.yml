@@ -40,6 +40,11 @@ merchant:
   callback:
     timeout: 10
 
+riak:
+  address: localhost
+  port: 8087
+  bucket: webhook
+
 retry:
   first.seconds: 30
   second.seconds: 600
