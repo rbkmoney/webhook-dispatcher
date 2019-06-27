@@ -5,7 +5,6 @@ import com.rbkmoney.webhook.dispatcher.Webhook;
 import com.rbkmoney.webhook.dispatcher.exception.CantRetryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -42,7 +41,7 @@ public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
             int statusCode = response.getStatusLine().getStatusCode();
             StringBuilder result = readResponse(response);
             log.info("Response from hook: messageId: {}, code: {}; body: {}", webhook.getSourceId(),
-                    statusCode, result != null ? result.toString() : "<empty>");
+                    statusCode, result.toString());
             if (HttpStatus.valueOf(statusCode).is2xxSuccessful()) {
                 return statusCode;
             } else if (statusCode == HttpStatus.REQUEST_TIMEOUT.value()) {
