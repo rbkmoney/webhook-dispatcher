@@ -13,6 +13,6 @@ public class PostponedDispatchFilter implements DispatchFilter {
 
     @Override
     public Boolean filter(Webhook webhook) {
-        return !webHookDao.isCommitParent(webhook);
+        return !webHookDao.isParentCommitted(webhook);
     }
 }

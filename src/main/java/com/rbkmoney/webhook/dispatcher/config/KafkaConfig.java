@@ -23,8 +23,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG;
-
 @Configuration
 public class KafkaConfig {
 
@@ -54,7 +52,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
-        props.put(MAX_POLL_RECORDS_CONFIG, 1);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         sslConfigure(props);
         return props;
@@ -68,36 +66,41 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
-        return createFactory(consumerFactory);
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaListenerContainerFactory(
+            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.forward}") int concurrency) {
+        return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
-        return createFactory(consumerFactory);
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaRetryListenerContainerFactory(
+            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.first.retry}") int concurrency) {
+        return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaSecondRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
-        return createFactory(consumerFactory);
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaSecondRetryListenerContainerFactory(
+            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.second.retry}") int concurrency) {
+        return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaThirdRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
-        return createFactory(consumerFactory);
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaThirdRetryListenerContainerFactory(
+            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.third.retry}") int concurrency) {
+        return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaLastRetryListenerContainerFactory(ConsumerFactory<String, Webhook> consumerFactory) {
-        return createFactory(consumerFactory);
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaLastRetryListenerContainerFactory(
+            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.last.retry}") int concurrency) {
+        return createFactory(consumerFactory, concurrency);
     }
 
-    private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> createFactory(ConsumerFactory<String, Webhook> consumerFactory) {
+    private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> createFactory(ConsumerFactory<String, Webhook> consumerFactory, int concurrency) {
         ConcurrentKafkaListenerContainerFactory<String, Webhook> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setErrorHandler(new LoggingErrorHandler());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        factory.setConcurrency(1);
+        factory.setConcurrency(concurrency);
         return factory;
     }
 

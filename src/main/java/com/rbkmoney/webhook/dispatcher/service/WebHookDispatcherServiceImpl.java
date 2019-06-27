@@ -5,13 +5,11 @@ import com.rbkmoney.webhook.dispatcher.Webhook;
 import com.rbkmoney.webhook.dispatcher.exception.CantRetryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpRequest;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +35,7 @@ public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
         HttpPost post = new HttpPost(webhook.getUrl());
         post.setEntity(new ByteArrayEntity(webhook.getRequestBody()));
         post.setHeader(CONTENT_TYPE, webhook.getContentType());
+
         try (CloseableHttpResponse response = client.execute(post)) {
             webhook.getAdditionalHeaders()
                     .forEach(post::addHeader);

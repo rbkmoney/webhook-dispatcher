@@ -28,6 +28,13 @@ kafka:
       third.retry: webhook-third-retry
       last.retry: webhook-last-retry
       dead.letter.queue: webhook-dead-letter-queue
+  concurrency:
+    forward: 1
+    first.retry: 1
+    second.retry: 1
+    third.retry: 1
+    last.retry: 1
+    dead.letter.queue: 1
   ssl:
     enable: false
     keystore-location: src/main/resources/cert/kenny-k.struzhkin.p12

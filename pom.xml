@@ -27,6 +27,7 @@
         <kafka.clients.version>2.1.1</kafka.clients.version>
         <shared.resources.version>0.3.6</shared.resources.version>
         <kafka.common.lib.version>0.0.8</kafka.common.lib.version>
+        <riak-client.version>2.1.1</riak-client.version>
     </properties>
 
     <dependencies>
@@ -125,7 +126,7 @@
         <dependency>
             <groupId>com.basho.riak</groupId>
             <artifactId>riak-client</artifactId>
-            <version>2.1.1</version>
+            <version>${riak-client.version}</version>
         </dependency>
 
         <!--test-->

@@ -2,6 +2,7 @@ package com.rbkmoney.webhook.dispatcher;
 
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.webhook.dispatcher.config.KafkaConfig;
+import com.rbkmoney.webhook.dispatcher.dao.AbstractRiakIntegrationTest;
 import com.rbkmoney.webhook.dispatcher.serde.WebHookDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -32,7 +33,7 @@ import java.util.Properties;
 @ContextConfiguration(classes = {KafkaConfig.class},
         initializers = AbstractKafkaIntegrationTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public abstract class AbstractKafkaIntegrationTest {
+public abstract class AbstractKafkaIntegrationTest extends AbstractRiakIntegrationTest {
 
     public static final String KAFKA_DOCKER_VERSION = "5.0.1";
 

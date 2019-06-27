@@ -1,7 +1,6 @@
 package com.rbkmoney.webhook.dispatcher;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -75,7 +74,7 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
 
         Thread.sleep(4500L);
 
-        Assert.assertFalse(webHookDao.isCommitParent(webhook));
+        Assert.assertFalse(webHookDao.isParentCommitted(webhook));
     }
 
     @NotNull

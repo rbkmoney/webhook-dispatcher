@@ -1,10 +1,12 @@
 package com.rbkmoney.webhook.dispatcher.filter;
 
 import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.utils.TimeoutUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class DeadRetryDispatchFilter implements DispatchFilter {
@@ -17,6 +19,6 @@ public class DeadRetryDispatchFilter implements DispatchFilter {
 
     @Override
     public Boolean filter(Webhook webhook) {
-        return Instant.now().toEpochMilli() - Instant.parse(webhook.getCreatedAt()).toEpochMilli() < deadRetryTimeout * 1000 * 60 * 60;
+        return TimeoutUtils.calculateTimeFromCreated(webhook.getCreatedAt()) < TimeUnit.HOURS.toHours(deadRetryTimeout);
     }
 }

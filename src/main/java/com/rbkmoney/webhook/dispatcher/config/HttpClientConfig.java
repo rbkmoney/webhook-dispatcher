@@ -15,9 +15,9 @@ public class HttpClientConfig {
     @Bean
     public CloseableHttpClient httpClient(@Value("${merchant.callback.timeout}") int timeout) {
         RequestConfig config = RequestConfig.custom()
-                .setConnectTimeout(1000)
-                .setConnectionRequestTimeout(1000)
-                .setSocketTimeout(1000)
+                .setConnectTimeout(timeout)
+                .setConnectionRequestTimeout(timeout)
+                .setSocketTimeout(timeout)
                 .build();
         return HttpClientBuilder.create()
                 .setDefaultRequestConfig(config)
