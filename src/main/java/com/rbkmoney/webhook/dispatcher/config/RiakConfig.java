@@ -29,7 +29,7 @@ public class RiakConfig {
     }
 
     @Bean
-    public RiakClient riakClient() {
-        return new RiakClient(riakCluster());
+    public RiakClient riakClient(RiakCluster riakCluster) {
+        return new RiakClient(riakCluster);
     }
 }
