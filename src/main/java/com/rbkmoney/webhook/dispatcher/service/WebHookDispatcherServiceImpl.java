@@ -2,7 +2,6 @@ package com.rbkmoney.webhook.dispatcher.service;
 
 import com.rbkmoney.kafka.common.exception.RetryableException;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.exception.CantRetryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -44,12 +43,9 @@ public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
                     statusCode, Arrays.toString(bufferAsByteArray));
             if (HttpStatus.valueOf(statusCode).is2xxSuccessful()) {
                 return statusCode;
-            } else if (statusCode == HttpStatus.REQUEST_TIMEOUT.value()) {
+            } else {
                 log.warn("Timeout error when send webhook: {}", webhookMessage);
                 throw new RetryableException(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
-            } else {
-                log.warn("Cant retry error when send webhook: {}", webhookMessage);
-                throw new CantRetryException("Cant retry webhook!");
             }
         } catch (SocketTimeoutException e) {
             log.warn("Timeout error when send webhook: {}", webhookMessage);

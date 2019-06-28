@@ -20,7 +20,7 @@ public class DeadRetryDispatchFilter implements DispatchFilter {
 
     @Override
     public Boolean filter(WebhookMessage webhookMessage) {
-        return TimeoutUtils.calculateTimeFromCreated(webhookMessage.getCreatedAt()) < TimeUnit.HOURS.toHours(deadRetryTimeout)
-                && !webHookDao.isCommitted(webhookMessage);
+        return TimeoutUtils.calculateTimeFromCreated(webhookMessage.getCreatedAt()) > TimeUnit.HOURS.toHours(deadRetryTimeout)
+                || webHookDao.isCommitted(webhookMessage);
     }
 }

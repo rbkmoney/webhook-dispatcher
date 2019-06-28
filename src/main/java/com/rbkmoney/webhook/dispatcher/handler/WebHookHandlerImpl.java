@@ -28,7 +28,7 @@ public class WebHookHandlerImpl implements WebHookHandler {
     @Override
     public void handle(String postponedTopic, WebhookMessage webhookMessage) {
         try {
-            if (!deadRetryDispatchFilter.filter(webhookMessage)) {
+            if (deadRetryDispatchFilter.filter(webhookMessage)) {
                 log.debug("Retry time is end for webhookMessage: {}", webhookMessage);
                 kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
             } else if (postponedDispatchFilter.filter(webhookMessage)) {

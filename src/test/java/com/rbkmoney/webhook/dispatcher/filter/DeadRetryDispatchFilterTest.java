@@ -31,6 +31,6 @@ public class DeadRetryDispatchFilterTest {
         Mockito.when(webHookDao.isCommitted(webhookMessage)).thenReturn(true);
         Boolean filter = dispatchFilter.filter(webhookMessage);
 
-        Assert.assertFalse(filter);
+        Assert.assertTrue(filter);
     }
 }
