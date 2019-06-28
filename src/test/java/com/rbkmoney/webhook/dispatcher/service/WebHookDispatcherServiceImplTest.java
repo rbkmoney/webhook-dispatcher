@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.matching.EqualToPattern;
 import com.rbkmoney.kafka.common.exception.RetryableException;
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -47,13 +47,13 @@ public class WebHookDispatcherServiceImplTest {
                         .withHeader("Content-Type", "text/xml")
                         .withBody("<response>Some content</response>")));
 
-        Webhook webhook = new Webhook();
-        webhook.setUrl("http://localhost:8089/test");
-        webhook.setRequestBody("{}".getBytes());
-        webhook.setContentType(ContentType.APPLICATION_JSON.getMimeType());
+        WebhookMessage webhookMessage = new WebhookMessage();
+        webhookMessage.setUrl("http://localhost:8089/test");
+        webhookMessage.setRequestBody("{}".getBytes());
+        webhookMessage.setContentType(ContentType.APPLICATION_JSON.getMimeType());
         HashMap<String, String> additionalHeaders = new HashMap<>();
-        webhook.setAdditionalHeaders(additionalHeaders);
-        webHookDispatcherService.dispatch(webhook);
+        webhookMessage.setAdditionalHeaders(additionalHeaders);
+        webHookDispatcherService.dispatch(webhookMessage);
     }
 
     @Test
@@ -65,12 +65,12 @@ public class WebHookDispatcherServiceImplTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody("{}")));
 
-        Webhook webhook = new Webhook();
-        webhook.setUrl("http://localhost:8089/test");
-        webhook.setRequestBody("{}".getBytes());
-        webhook.setContentType(ContentType.APPLICATION_JSON.getMimeType());
+        WebhookMessage webhookMessage = new WebhookMessage();
+        webhookMessage.setUrl("http://localhost:8089/test");
+        webhookMessage.setRequestBody("{}".getBytes());
+        webhookMessage.setContentType(ContentType.APPLICATION_JSON.getMimeType());
         HashMap<String, String> additionalHeaders = new HashMap<>();
-        webhook.setAdditionalHeaders(additionalHeaders);
-        webHookDispatcherService.dispatch(webhook);
+        webhookMessage.setAdditionalHeaders(additionalHeaders);
+        webHookDispatcherService.dispatch(webhookMessage);
     }
 }

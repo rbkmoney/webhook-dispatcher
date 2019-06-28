@@ -1,6 +1,6 @@
 package com.rbkmoney.webhook.dispatcher.handler;
 
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.filter.TimeDispatchFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,19 +17,19 @@ public class RetryHandler {
 
     private static final long MILLIS = 500L;
 
-    public void handle(String topic, Acknowledgment acknowledgment, Webhook webhook, Long timeout) {
-        log.debug("RetryWebHookHandler webhook: {}", webhook);
+    public void handle(String topic, Acknowledgment acknowledgment, WebhookMessage webhookMessage, Long timeout) {
+        log.debug("RetryWebHookHandler webhookMessage: {}", webhookMessage);
         try {
-            if (timeDispatchFilter.filter(webhook, timeout)) {
-                handler.handle(topic, webhook);
+            if (timeDispatchFilter.filter(webhookMessage, timeout)) {
+                handler.handle(topic, webhookMessage);
                 acknowledgment.acknowledge();
             }
             Thread.sleep(MILLIS);
         } catch (InterruptedException e) {
-            log.error("InterruptedException when listen webhook: {} e: ", webhook, e);
+            log.error("InterruptedException when listen webhookMessage: {} e: ", webhookMessage, e);
             Thread.currentThread().interrupt();
         } catch (Exception e) {
-            log.error("Error when listen webhook: {} e: ", webhook, e);
+            log.error("Error when listen webhookMessage: {} e: ", webhookMessage, e);
         }
     }
 

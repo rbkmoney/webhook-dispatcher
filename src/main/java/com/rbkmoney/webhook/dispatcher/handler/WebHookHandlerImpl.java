@@ -1,7 +1,7 @@
 package com.rbkmoney.webhook.dispatcher.handler;
 
 import com.rbkmoney.kafka.common.exception.RetryableException;
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
 import com.rbkmoney.webhook.dispatcher.filter.DispatchFilter;
 import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
@@ -20,30 +20,30 @@ public class WebHookHandlerImpl implements WebHookHandler {
     private final DispatchFilter postponedDispatchFilter;
     private final DispatchFilter deadRetryDispatchFilter;
     private final WebHookDao webHookDao;
-    private final KafkaTemplate<String, Webhook> kafkaTemplate;
+    private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
 
     @Value("${kafka.topic.webhook.dead.letter.queue}")
     private String dlq;
 
     @Override
-    public void handle(String postponedTopic, Webhook webhook) {
+    public void handle(String postponedTopic, WebhookMessage webhookMessage) {
         try {
-            if (!deadRetryDispatchFilter.filter(webhook)) {
-                log.debug("Retry time is end for webhook: {}", webhook);
-                kafkaTemplate.send(dlq, webhook.source_id, webhook);
-            } else if (postponedDispatchFilter.filter(webhook)) {
-                log.debug("Resend to topic: {} webhook: {}", postponedTopic, webhook);
-                kafkaTemplate.send(postponedTopic, webhook.source_id, webhook);
+            if (!deadRetryDispatchFilter.filter(webhookMessage)) {
+                log.debug("Retry time is end for webhookMessage: {}", webhookMessage);
+                kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
+            } else if (postponedDispatchFilter.filter(webhookMessage)) {
+                log.debug("Resend to topic: {} webhookMessage: {}", postponedTopic, webhookMessage);
+                kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
             } else {
-                webHookDispatcherService.dispatch(webhook);
-                webHookDao.commit(webhook);
+                webHookDispatcherService.dispatch(webhookMessage);
+                webHookDao.commit(webhookMessage);
             }
         } catch (RetryableException e) {
-            log.warn("Error when handle webhook: {}", webhook, e);
-            kafkaTemplate.send(postponedTopic, webhook.source_id, webhook);
+            log.warn("Error when handle webhookMessage: {}", webhookMessage, e);
+            kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
         } catch (Exception e) {
-            log.error("Send to dlq webhook: {} by e:", webhook, e);
-            kafkaTemplate.send(dlq, webhook.source_id, webhook);
+            log.error("Send to dlq webhookMessage: {} by e:", webhookMessage, e);
+            kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
         }
     }
 

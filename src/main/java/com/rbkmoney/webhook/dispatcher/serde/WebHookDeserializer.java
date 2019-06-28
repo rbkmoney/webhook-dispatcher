@@ -1,13 +1,13 @@
 package com.rbkmoney.webhook.dispatcher.serde;
 
 import com.rbkmoney.kafka.common.serialization.AbstractThriftDeserializer;
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 
-public class WebHookDeserializer extends AbstractThriftDeserializer<Webhook> {
+public class WebHookDeserializer extends AbstractThriftDeserializer<WebhookMessage> {
 
     @Override
-    public Webhook deserialize(String s, byte[] bytes) {
-        return super.deserialize(bytes, new Webhook());
+    public WebhookMessage deserialize(String s, byte[] bytes) {
+        return super.deserialize(bytes, new WebhookMessage());
     }
     
 }

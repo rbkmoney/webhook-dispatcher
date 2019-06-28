@@ -1,7 +1,7 @@
 package com.rbkmoney.webhook.dispatcher.config;
 
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.serde.WebHookDeserializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -59,44 +59,44 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, Webhook> consumerFactory() {
+    public ConsumerFactory<String, WebhookMessage> consumerFactory() {
         Map<String, Object> configs = consumerConfigs();
         configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, WebHookDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(configs);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaListenerContainerFactory(
-            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.forward}") int concurrency) {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaListenerContainerFactory(
+            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.forward}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaRetryListenerContainerFactory(
-            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.first.retry}") int concurrency) {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaRetryListenerContainerFactory(
+            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.first.retry}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaSecondRetryListenerContainerFactory(
-            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.second.retry}") int concurrency) {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaSecondRetryListenerContainerFactory(
+            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.second.retry}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaThirdRetryListenerContainerFactory(
-            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.third.retry}") int concurrency) {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaThirdRetryListenerContainerFactory(
+            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.third.retry}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> kafkaLastRetryListenerContainerFactory(
-            ConsumerFactory<String, Webhook> consumerFactory, @Value("${kafka.concurrency.last.retry}") int concurrency) {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaLastRetryListenerContainerFactory(
+            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.last.retry}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
-    private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Webhook>> createFactory(ConsumerFactory<String, Webhook> consumerFactory, int concurrency) {
-        ConcurrentKafkaListenerContainerFactory<String, Webhook> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> createFactory(ConsumerFactory<String, WebhookMessage> consumerFactory, int concurrency) {
+        ConcurrentKafkaListenerContainerFactory<String, WebhookMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setErrorHandler(new LoggingErrorHandler());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
@@ -118,7 +118,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, Webhook> producerFactory() {
+    public ProducerFactory<String, WebhookMessage> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -128,7 +128,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, Webhook> kafkaTemplate() {
+    public KafkaTemplate<String, WebhookMessage> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

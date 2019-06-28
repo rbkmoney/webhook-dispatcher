@@ -1,6 +1,6 @@
 package com.rbkmoney.webhook.dispatcher.dao;
 
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.config.RiakConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -24,7 +24,7 @@ public class WebHookDaoImplTest extends AbstractRiakIntegrationTest {
     @Test
     public void riakTest() throws InterruptedException {
         Thread.sleep(20000L);
-        Webhook webHook = new Webhook();
+        WebhookMessage webHook = new WebhookMessage();
         webHook.setSourceId("test");
         webHook.setEventId(1);
         webHook.setUrl("/test");

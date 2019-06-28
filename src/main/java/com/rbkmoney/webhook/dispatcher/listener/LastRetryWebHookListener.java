@@ -1,6 +1,6 @@
 package com.rbkmoney.webhook.dispatcher.listener;
 
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.handler.RetryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +22,8 @@ public class LastRetryWebHookListener {
     private final RetryHandler handler;
 
     @KafkaListener(topics = "${kafka.topic.webhook.last.retry}", containerFactory = "kafkaLastRetryListenerContainerFactory")
-    public void listen(Webhook webhook, Acknowledgment acknowledgment) {
-        handler.handle(postponedTopic, acknowledgment, webhook, timeout);
+    public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
+        handler.handle(postponedTopic, acknowledgment, webhookMessage, timeout);
     }
 
 }

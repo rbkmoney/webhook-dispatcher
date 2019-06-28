@@ -1,6 +1,6 @@
 package com.rbkmoney.webhook.dispatcher.listener;
 
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.handler.WebHookHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +20,13 @@ public class WebHookListener {
     private String postponedTopic;
 
     @KafkaListener(topics = "${kafka.topic.webhook.forward}", containerFactory = "kafkaListenerContainerFactory")
-    public void listen(Webhook webhook, Acknowledgment acknowledgment) {
-        log.info("WebHookListener webhook: {}", webhook);
+    public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
+        log.info("WebHookListener webhook: {}", webhookMessage);
         try {
-            handler.handle(postponedTopic, webhook);
+            handler.handle(postponedTopic, webhookMessage);
             acknowledgment.acknowledge();
         }  catch (Exception e) {
-            log.error("Error when listen webhook value: {} e: ", webhook, e);
+            log.error("Error when listen webhook value: {} e: ", webhookMessage, e);
         }
     }
 

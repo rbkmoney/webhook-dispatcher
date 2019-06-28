@@ -1,11 +1,13 @@
 package com.rbkmoney.webhook.dispatcher.dao;
 
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 
 public interface WebHookDao {
 
-    void commit(Webhook webHook);
+    void commit(WebhookMessage webhookMessage);
 
-    boolean isParentCommitted(Webhook webHook);
+    Boolean isParentCommitted(WebhookMessage webhookMessage);
+
+    Boolean isCommitted(WebhookMessage webhookMessage);
 
 }

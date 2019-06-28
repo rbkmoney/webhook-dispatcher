@@ -1,9 +1,9 @@
 package com.rbkmoney.webhook.dispatcher.filter;
 
-import com.rbkmoney.webhook.dispatcher.Webhook;
+import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 
 public interface DispatchFilter {
 
-    Boolean filter(Webhook t);
+    Boolean filter(WebhookMessage t);
 
 }

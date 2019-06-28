@@ -47,9 +47,9 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
                                 .withBody(response)));
 
         String sourceId = "123";
-        Webhook webhook = createWebhook(sourceId, Instant.now().toString(), 0);
+        WebhookMessage webhook = createWebhook(sourceId, Instant.now().toString(), 0);
         ProducerRecord producerRecord = new ProducerRecord<>(Initializer.WEBHOOK_FORWARD, webhook.source_id, webhook);
-        Producer<String, Webhook> producer = createProducer();
+        Producer<String, WebhookMessage> producer = createProducer();
 
         producer.send(producerRecord).get();
         producer.close();
@@ -78,8 +78,8 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
     }
 
     @NotNull
-    private Webhook createWebhook(String sourceId, String createdAt, long eventId) {
-        Webhook webhook = new Webhook();
+    private WebhookMessage createWebhook(String sourceId, String createdAt, long eventId) {
+        WebhookMessage webhook = new WebhookMessage();
         webhook.setSourceId(sourceId);
         webhook.setCreatedAt(createdAt);
         webhook.setUrl(URL);
