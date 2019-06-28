@@ -61,7 +61,7 @@ public class WebHookDaoImpl implements WebHookDao {
             String key = generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getParentEventId());
             log.debug("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
             Location quoteObjectLocation = createLocation(bucket, key);
-            return isCommit(quoteObjectLocation);
+            return isObjectExist(quoteObjectLocation);
         } catch (InterruptedException e) {
             log.error("InterruptedException in WebHookDaoImpl when get e: ", e);
             Thread.currentThread().interrupt();
@@ -72,7 +72,7 @@ public class WebHookDaoImpl implements WebHookDao {
         }
     }
 
-    private boolean isCommit(Location quoteObjectLocation) throws java.util.concurrent.ExecutionException, InterruptedException {
+    private boolean isObjectExist(Location quoteObjectLocation) throws java.util.concurrent.ExecutionException, InterruptedException {
         FetchValue fetch = new FetchValue.Builder(quoteObjectLocation)
                 .withOption(FetchValue.Option.R, new Quorum(3))
                 .build();
@@ -87,7 +87,7 @@ public class WebHookDaoImpl implements WebHookDao {
             String key = generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
             log.debug("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
             Location quoteObjectLocation = createLocation(bucket, key);
-            return isCommit(quoteObjectLocation);
+            return isObjectExist(quoteObjectLocation);
         } catch (InterruptedException e) {
             log.error("InterruptedException in WebHookDaoImpl when get e: ", e);
             Thread.currentThread().interrupt();
