@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
@@ -28,7 +27,7 @@ public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
     private final CloseableHttpClient client;
 
     @Override
-    public int dispatch(WebhookMessage webhookMessage) throws IOException {
+    public int dispatch(WebhookMessage webhookMessage) {
         log.info("WebHookDispatcherServiceImpl dispatch hook: {} ", webhookMessage);
         HttpPost post = new HttpPost(webhookMessage.getUrl());
         post.setEntity(new ByteArrayEntity(webhookMessage.getRequestBody()));
@@ -47,7 +46,7 @@ public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
                 log.warn("Timeout error when send webhook: {}", webhookMessage);
                 throw new RetryableException(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
             }
-        } catch (SocketTimeoutException e) {
+        } catch (IOException e) {
             log.warn("Timeout error when send webhook: {}", webhookMessage);
             throw new RetryableException(e);
         }
