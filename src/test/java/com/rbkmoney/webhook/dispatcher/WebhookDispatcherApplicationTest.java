@@ -87,6 +87,7 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
         webhook.setRequestBody("\\{\\}".getBytes());
         webhook.setEventId(eventId);
         webhook.setAdditionalHeaders(new HashMap<>());
+        webhook.setParentEventId(-1);
         return webhook;
     }
 

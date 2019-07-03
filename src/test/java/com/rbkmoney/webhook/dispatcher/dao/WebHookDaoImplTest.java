@@ -28,6 +28,7 @@ public class WebHookDaoImplTest extends AbstractRiakIntegrationTest {
         webHook.setSourceId("test");
         webHook.setEventId(1);
         webHook.setUrl("/test");
+        webHook.setParentEventId(-1);
         webHookDao.commit(webHook);
 
         webHook.setParentEventId(1);
