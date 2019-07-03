@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class HttpClientConfig {
 
     @Bean
-    public CloseableHttpClient httpClient(@Value("${merchant.callback.timeout}") int timeout) {
+    public CloseableHttpClient httpClient(@Value("${merchant.timeout}") int timeout) {
         RequestConfig config = RequestConfig.custom()
                 .setConnectTimeout(timeout)
                 .setConnectionRequestTimeout(timeout)

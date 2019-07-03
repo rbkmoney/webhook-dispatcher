@@ -9,10 +9,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PostponedDispatchFilter implements DispatchFilter {
 
+    private static final long PARENT_NOT_EXIST_ID = -1;
     private final WebHookDao webHookDao;
 
     @Override
     public Boolean filter(WebhookMessage webhookMessage) {
-        return !webHookDao.isParentCommitted(webhookMessage);
+        return webhookMessage.getParentEventId() != PARENT_NOT_EXIST_ID && !webHookDao.isParentCommitted(webhookMessage);
     }
 }
