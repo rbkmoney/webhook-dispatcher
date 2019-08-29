@@ -30,7 +30,7 @@ public class WebHookDaoImpl implements WebHookDao {
     @Override
     public void commit(WebhookMessage webhookMessage) {
         try {
-            log.debug("WebHookDaoImpl create in bucket: {} webHook: {}", bucket, webhookMessage);
+            log.info("WebHookDaoImpl create in bucket: {} webHook: {}", bucket, webhookMessage);
             RiakObject quoteObject = new RiakObject()
                     .setContentType(MediaType.TEXT_PLAIN_VALUE)
                     .setValue(BinaryValue.create(webhookMessage.url));
@@ -59,7 +59,7 @@ public class WebHookDaoImpl implements WebHookDao {
     public Boolean isParentCommitted(WebhookMessage webhookMessage) {
         try {
             String key = generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getParentEventId());
-            log.debug("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
+            log.info("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
             Location quoteObjectLocation = createLocation(bucket, key);
             return isObjectExist(quoteObjectLocation);
         } catch (InterruptedException e) {
@@ -85,7 +85,7 @@ public class WebHookDaoImpl implements WebHookDao {
     public Boolean isCommitted(WebhookMessage webhookMessage) {
         try {
             String key = generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
-            log.debug("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
+            log.info("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
             Location quoteObjectLocation = createLocation(bucket, key);
             return isObjectExist(quoteObjectLocation);
         } catch (InterruptedException e) {
