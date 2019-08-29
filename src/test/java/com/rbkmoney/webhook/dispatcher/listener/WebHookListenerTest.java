@@ -22,7 +22,6 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 
-@Ignore
 public class WebHookListenerTest {
 
     WebHookListener webHookListener;
