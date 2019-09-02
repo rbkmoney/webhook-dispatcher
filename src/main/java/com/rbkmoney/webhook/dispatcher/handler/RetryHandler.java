@@ -18,13 +18,16 @@ public class RetryHandler {
     private static final long MILLIS = 500L;
 
     public void handle(String topic, Acknowledgment acknowledgment, WebhookMessage webhookMessage, Long timeout) {
-        log.debug("RetryWebHookHandler webhookMessage: {}", webhookMessage);
+        log.info("RetryWebHookHandler webhookMessage: {}", webhookMessage);
         try {
             if (timeDispatchFilter.filter(webhookMessage, timeout)) {
                 handler.handle(topic, webhookMessage);
                 acknowledgment.acknowledge();
+                log.info("Retry webhookMessage: {} is finished", webhookMessage);
+            } else {
+                Thread.sleep(MILLIS);
+                log.info("Waiting timeout timeout: {}", timeout);
             }
-            Thread.sleep(MILLIS);
         } catch (InterruptedException e) {
             log.error("InterruptedException when listen webhookMessage: {} e: ", webhookMessage, e);
             Thread.currentThread().interrupt();
