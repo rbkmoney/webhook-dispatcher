@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SecondRetryWebHookListener {
 
-    @Value("${retry.first.seconds}")
+    @Value("${retry.second.seconds}")
     private long timeout;
     @Value("${kafka.topic.webhook.third.retry}")
     private String postponedTopic;

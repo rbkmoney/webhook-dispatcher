@@ -41,9 +41,11 @@ public class WebHookHandlerImpl implements WebHookHandler {
         } catch (RetryableException e) {
             log.warn("Error when handle webhookMessage: {}", webhookMessage, e);
             kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
+            log.info("Send to retry topic: {} source_id: {} message: {}", postponedTopic, webhookMessage.source_id, webhookMessage);
         } catch (Exception e) {
             log.error("Send to dlq webhookMessage: {} by e:", webhookMessage, e);
             kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
+            log.info("Send to dlq topic: {} source_id: {} message: {}", dlq, webhookMessage.source_id, webhookMessage);
         }
     }
 
