@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 @RunWith(SpringRunner.class)
 @EnableConfigurationProperties({DataSourceProperties.class})
-@ContextConfiguration(classes = {DataSourceAutoConfiguration.class, FlywayAutoConfiguration.class}, initializers = DaoTestBase.Initializer.class)
+@ContextConfiguration(classes = {DataSourceAutoConfiguration.class}, initializers = DaoTestBase.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Slf4j
 public abstract class DaoTestBase extends AbstractTestUtils {

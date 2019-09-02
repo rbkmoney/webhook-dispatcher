@@ -25,6 +25,7 @@ spring:
     hikari.idle-timeout: 30000
   flyway:
     schemas: wb_dispatch
+    url: @db.url@
 
 info:
   version: @project.version@

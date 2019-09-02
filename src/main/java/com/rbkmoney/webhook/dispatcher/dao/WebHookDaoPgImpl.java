@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.time.Instant;
 
 @Slf4j
 @Service
@@ -24,8 +23,8 @@ public class WebHookDaoPgImpl extends NamedParameterJdbcDaoSupport implements We
         try {
             String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
             log.info("WebHookDaoImpl commit key: {} webHook: {}", key, webhookMessage);
-            String sqlQuery = "insert into wb_dispatch.commit_log(id, creation_time) values (?, ?)";
-            getJdbcTemplate().update(sqlQuery, key, Instant.now().toString());
+            String sqlQuery = "insert into wb_dispatch.commit_log(id) values (?)";
+            getJdbcTemplate().update(sqlQuery, key);
         } catch (Exception e) {
             log.error("Exception in WebHookDao when commit e: ", e);
             throw new RetryableException(e);
@@ -53,7 +52,7 @@ public class WebHookDaoPgImpl extends NamedParameterJdbcDaoSupport implements We
             MapSqlParameterSource params = new MapSqlParameterSource("id", key);
             Boolean isExist = getNamedParameterJdbcTemplate()
                     .queryForObject(sqlQuery, params, Boolean.class);
-            log.info("Row for {} with key: {} is exist", webhookMessage, key);
+            log.info("Row for {} with key: {} is exist: {}", webhookMessage, key, isExist);
             return isExist;
         } catch (Exception e) {
             log.error("Exception when find parent event ", e);

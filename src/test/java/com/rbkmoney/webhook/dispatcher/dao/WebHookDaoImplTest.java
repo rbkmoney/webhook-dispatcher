@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -14,7 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = {WebHookDaoPgImpl.class})
+@ContextConfiguration(classes = {WebHookDaoPgImpl.class, FlywayAutoConfiguration.class})
 public class WebHookDaoImplTest extends DaoTestBase {
 
     @Value("${riak.bucket}")
