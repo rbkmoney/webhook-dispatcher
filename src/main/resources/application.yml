@@ -8,12 +8,24 @@ management:
       statsd:
         flavor: etsy
         enabled: false
+
 spring:
   application:
     name: @project.name@
   output:
     ansi:
       enabled: always
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.postgresql.Driver
+    url: @db.url@
+    username: @db.user@
+    password: @db.password@
+    hikari.maximum-pool-size: 10
+    hikari.idle-timeout: 30000
+  flyway:
+    schemas: wb_dispatch
+
 info:
   version: @project.version@
   stage: dev

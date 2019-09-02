@@ -28,6 +28,17 @@
         <kafka.common.lib.version>0.0.8</kafka.common.lib.version>
         <riak-client.version>2.1.1</riak-client.version>
         <webhook-dispatcher-proto.version>1.8-6d6cf27</webhook-dispatcher-proto.version>
+
+        <db.host.name>localhost</db.host.name>
+        <db.host.port>5432</db.host.port>
+        <db.name>webhook-dispatcher</db.name>
+        <db.url>jdbc:postgresql://${db.host.name}:${db.host.port}/${db.name}</db.url>
+        <db.user>postgres</db.user>
+        <db.password>postgres</db.password>
+        <db.schema>wb_dispatch</db.schema>
+        <db.common.lib.version>0.0.1-SNAPSHOT</db.common.lib.version>
+        <flyway.version>5.2.3</flyway.version>
+
     </properties>
 
     <dependencies>
@@ -57,6 +68,11 @@
             <artifactId>webhook-dispatcher-proto</artifactId>
             <version>${webhook-dispatcher-proto.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>db-common-lib</artifactId>
+            <version>${db.common.lib.version}</version>
+        </dependency>
 
         <!--spring-->
         <dependency>
@@ -76,6 +92,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
         <!--kafka-->
@@ -106,7 +126,6 @@
             <scope>test</scope>
         </dependency>
 
-
         <!--third party-->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -128,6 +147,21 @@
             <artifactId>riak-client</artifactId>
             <version>${riak-client.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
 
         <!--test-->
         <dependency>
@@ -147,6 +181,19 @@
             <version>3.1.6</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>easyway</artifactId>
+            <version>0.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.10.2</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -199,6 +246,31 @@
                     <execution>
                         <goals>
                             <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway.version}</version>
+                <configuration>
+                    <url>${db.url}</url>
+                    <user>${db.user}</user>
+                    <password>${db.password}</password>
+                    <schemas>
+                        <schema>${db.schema}</schema>
+                    </schemas>
+                    <locations>
+                        <location>filesystem:${project.basedir}/src/main/resources/db/migration</location>
+                    </locations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>migrate</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
                         </goals>
                     </execution>
                 </executions>

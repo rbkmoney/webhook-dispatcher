@@ -10,7 +10,6 @@ import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherServiceImpl;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -26,7 +25,7 @@ public class WebHookListenerTest {
 
     WebHookListener webHookListener;
     @Mock
-    private WebHookDao webHookDao;
+    private WebHookDao webHookDaoPgImpl;
     @Mock
     private KafkaTemplate<String, WebhookMessage> kafkaTemplate;
     @Mock
@@ -42,14 +41,14 @@ public class WebHookListenerTest {
                         .setSocketTimeout(60000)
                         .build())
                 .build());
-        webHookListener = new WebHookListener(new WebHookHandlerImpl(webHookDispatcherService, new PostponedDispatchFilter(webHookDao),
-                new DeadRetryDispatchFilter(webHookDao), webHookDao, kafkaTemplate));
+        webHookListener = new WebHookListener(new WebHookHandlerImpl(webHookDispatcherService, new PostponedDispatchFilter(webHookDaoPgImpl),
+                new DeadRetryDispatchFilter(webHookDaoPgImpl), webHookDaoPgImpl, kafkaTemplate));
     }
 
     @Test
     public void listen() {
 
-        Mockito.when(webHookDao.isCommitted(any())).thenReturn(false);
+        Mockito.when(webHookDaoPgImpl.isCommitted(any())).thenReturn(false);
 
         WebhookMessage webhookMessage = new WebhookMessage();
         webhookMessage.setUrl("https://webhook.site/e312eefc-54fc-4bca-928e-26f0fc95fc80");

@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 public class PostponedDispatchFilter implements DispatchFilter {
 
     private static final long PARENT_NOT_EXIST_ID = -1;
-    private final WebHookDao webHookDao;
+    private final WebHookDao webHookDaoPgImpl;
 
     @Override
     public Boolean filter(WebhookMessage webhookMessage) {
-        return webhookMessage.getParentEventId() != PARENT_NOT_EXIST_ID && !webHookDao.isParentCommitted(webhookMessage);
+        return webhookMessage.getParentEventId() != PARENT_NOT_EXIST_ID && !webHookDaoPgImpl.isParentCommitted(webhookMessage);
     }
 }
