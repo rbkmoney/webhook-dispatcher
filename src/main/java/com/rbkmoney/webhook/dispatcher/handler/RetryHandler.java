@@ -26,7 +26,7 @@ public class RetryHandler {
                 log.info("Retry webhookMessage: {} is finished", webhookMessage);
             } else {
                 Thread.sleep(MILLIS);
-                log.info("Waiting timeout timeout: {}", timeout);
+                log.info("Waiting timeout: {}", timeout);
             }
         } catch (InterruptedException e) {
             log.error("InterruptedException when listen webhookMessage: {} e: ", webhookMessage, e);
