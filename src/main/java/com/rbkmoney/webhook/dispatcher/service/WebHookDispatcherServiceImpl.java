@@ -48,7 +48,7 @@ public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
                 throw new RetryableException(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
             }
         } catch (IOException e) {
-            log.warn("Timeout error when send webhook: {} e: ", webhookMessage, e);
+            log.warn("Timeout error when send webhook: {} ", webhookMessage, e);
             throw new RetryableException(e);
         }
     }
