@@ -43,11 +43,12 @@ public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
             if (HttpStatus.valueOf(statusCode).is2xxSuccessful()) {
                 return statusCode;
             } else {
-                log.warn("Timeout error when send webhook: {}", webhookMessage);
+                log.warn("Timeout error when send webhook: {} statusCode: {} reason: {}", webhookMessage, statusCode,
+                        response.getStatusLine().getReasonPhrase());
                 throw new RetryableException(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
             }
         } catch (IOException e) {
-            log.warn("Timeout error when send webhook: {}", webhookMessage);
+            log.warn("Timeout error when send webhook: {} ", webhookMessage, e);
             throw new RetryableException(e);
         }
     }

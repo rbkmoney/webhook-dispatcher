@@ -15,21 +15,24 @@ public class RetryHandler {
     private final WebHookHandlerImpl handler;
     private final TimeDispatchFilter timeDispatchFilter;
 
-    private static final long MILLIS = 500L;
+    private static final long WAITING_PERIOD = 500L;
 
     public void handle(String topic, Acknowledgment acknowledgment, WebhookMessage webhookMessage, Long timeout) {
-        log.debug("RetryWebHookHandler webhookMessage: {}", webhookMessage);
+        log.info("RetryWebHookHandler webhookMessage: {}", webhookMessage);
         try {
             if (timeDispatchFilter.filter(webhookMessage, timeout)) {
                 handler.handle(topic, webhookMessage);
                 acknowledgment.acknowledge();
+                log.info("Retry webhookMessage: {} is finished", webhookMessage);
+            } else {
+                Thread.sleep(WAITING_PERIOD);
+                log.info("Waiting timeout: {}", timeout);
             }
-            Thread.sleep(MILLIS);
         } catch (InterruptedException e) {
-            log.error("InterruptedException when listen webhookMessage: {} e: ", webhookMessage, e);
+            log.error("InterruptedException when listen webhookMessage: {} ", webhookMessage, e);
             Thread.currentThread().interrupt();
         } catch (Exception e) {
-            log.error("Error when listen webhookMessage: {} e: ", webhookMessage, e);
+            log.error("Error when listen webhookMessage: {} ", webhookMessage, e);
         }
     }
 
