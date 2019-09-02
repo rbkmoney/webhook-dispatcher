@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class DeadRetryDispatchFilter implements DispatchFilter {
 
-    private final WebHookDao webHookDao;
+    private final WebHookDao webHookDaoPgImpl;
 
     @Value("${retry.dead.time.hours:24}")
     private int deadRetryTimeout;
@@ -21,6 +21,6 @@ public class DeadRetryDispatchFilter implements DispatchFilter {
     @Override
     public Boolean filter(WebhookMessage webhookMessage) {
         return TimeoutUtils.calculateTimeFromCreated(webhookMessage.getCreatedAt()) > TimeUnit.HOURS.toMillis(deadRetryTimeout)
-                || webHookDao.isCommitted(webhookMessage);
+                || webHookDaoPgImpl.isCommitted(webhookMessage);
     }
 }

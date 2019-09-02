@@ -19,7 +19,7 @@ public class WebHookHandlerImpl implements WebHookHandler {
     private final WebHookDispatcherService webHookDispatcherService;
     private final DispatchFilter postponedDispatchFilter;
     private final DispatchFilter deadRetryDispatchFilter;
-    private final WebHookDao webHookDao;
+    private final WebHookDao webHookDaoPgImpl;
     private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
 
     @Value("${kafka.topic.webhook.dead.letter.queue}")
@@ -36,7 +36,7 @@ public class WebHookHandlerImpl implements WebHookHandler {
                 kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
             } else {
                 webHookDispatcherService.dispatch(webhookMessage);
-                webHookDao.commit(webhookMessage);
+                webHookDaoPgImpl.commit(webhookMessage);
             }
         } catch (RetryableException e) {
             log.warn("Error when handle webhookMessage: {}", webhookMessage, e);

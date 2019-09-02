@@ -10,6 +10,7 @@ import com.basho.riak.client.core.query.RiakObject;
 import com.basho.riak.client.core.util.BinaryValue;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.exception.RiakExecutionException;
+import com.rbkmoney.webhook.dispatcher.utils.KeyGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class WebHookDaoImpl implements WebHookDao {
 
@@ -34,7 +35,7 @@ public class WebHookDaoImpl implements WebHookDao {
             RiakObject quoteObject = new RiakObject()
                     .setContentType(MediaType.TEXT_PLAIN_VALUE)
                     .setValue(BinaryValue.create(webhookMessage.url));
-            String key = generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
+            String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
             Location quoteObjectLocation = createLocation(bucket, key);
             StoreValue storeOp = new StoreValue.Builder(quoteObject)
                     .withOption(StoreValue.Option.W, Quorum.oneQuorum())
@@ -51,14 +52,10 @@ public class WebHookDaoImpl implements WebHookDao {
         }
     }
 
-    private String generateKey(Long hookId, String sourceId, long eventId) {
-        return hookId + DELIMETER + sourceId + DELIMETER + eventId;
-    }
-
     @Override
     public Boolean isParentCommitted(WebhookMessage webhookMessage) {
         try {
-            String key = generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getParentEventId());
+            String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getParentEventId());
             log.info("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
             Location quoteObjectLocation = createLocation(bucket, key);
             return isObjectExist(quoteObjectLocation);
@@ -84,7 +81,7 @@ public class WebHookDaoImpl implements WebHookDao {
     @Override
     public Boolean isCommitted(WebhookMessage webhookMessage) {
         try {
-            String key = generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
+            String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
             log.info("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
             Location quoteObjectLocation = createLocation(bucket, key);
             return isObjectExist(quoteObjectLocation);
