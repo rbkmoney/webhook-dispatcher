@@ -56,7 +56,7 @@ kafka:
     server-password: kenny12
     server-keystore-location: src/
 
-merchant.timeout: 10
+merchant.timeout: 10000
 
 riak:
   address: localhost
