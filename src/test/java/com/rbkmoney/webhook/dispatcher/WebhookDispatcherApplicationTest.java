@@ -22,7 +22,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebhookDispatcherApplication.class)
-@TestPropertySource(properties = "merchant.callback.timeout=1")
+@TestPropertySource(properties = "merchant.timeout=1")
 public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTest {
 
     public static final long EVENT_ID = 123L;
@@ -54,7 +54,7 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
         producer.send(producerRecord).get();
         producer.close();
 
-        Thread.sleep(4500L);
+        Thread.sleep(45000L);
 
         stubFor(
                 post(urlEqualTo("/"))
