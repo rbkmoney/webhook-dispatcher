@@ -54,7 +54,7 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
         producer.send(producerRecord).get();
         producer.close();
 
-        Thread.sleep(45000L);
+        Thread.sleep(4500L);
 
         stubFor(
                 post(urlEqualTo("/"))
