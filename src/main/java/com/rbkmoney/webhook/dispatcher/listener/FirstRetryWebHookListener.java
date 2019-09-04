@@ -23,6 +23,8 @@ public class FirstRetryWebHookListener {
 
     @KafkaListener(topics = "${kafka.topic.webhook.first.retry}", containerFactory = "kafkaRetryListenerContainerFactory")
     public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
+        log.info("First retry sourceId: {} webhookId: {} eventId: {}", webhookMessage.getSourceId(),
+                webhookMessage.getWebhookId(), webhookMessage.getEventId());
         handler.handle(postponedTopic, acknowledgment, webhookMessage, timeout);
     }
 

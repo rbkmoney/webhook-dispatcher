@@ -16,6 +16,10 @@ public class SecondRetryWebHookListener {
 
     @Value("${retry.second.seconds}")
     private long timeout;
+
+    @Value("${retry.first.seconds}")
+    private long prevTimeout;
+
     @Value("${kafka.topic.webhook.third.retry}")
     private String postponedTopic;
 
@@ -23,7 +27,9 @@ public class SecondRetryWebHookListener {
 
     @KafkaListener(topics = "${kafka.topic.webhook.second.retry}", containerFactory = "kafkaSecondRetryListenerContainerFactory")
     public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
-        handler.handle(postponedTopic, acknowledgment, webhookMessage, timeout);
+        log.info("Second retry sourceId: {} webhookId: {} eventId: {}", webhookMessage.getSourceId(),
+                webhookMessage.getWebhookId(), webhookMessage.getEventId());
+        handler.handle(postponedTopic, acknowledgment, webhookMessage, timeout + prevTimeout);
     }
 
 }
