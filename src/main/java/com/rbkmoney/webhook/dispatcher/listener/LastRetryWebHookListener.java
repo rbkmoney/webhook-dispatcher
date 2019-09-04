@@ -21,8 +21,6 @@ public class LastRetryWebHookListener {
     private final long timeout;
     @Value("${kafka.topic.webhook.last.retry}")
     private final String postponedTopic;
-    @Value("${kafka.topic.webhook.dead.letter.queue}")
-    private final String dlq;
 
     @Value("${retry.third.seconds}")
     private final long thirdTimeout;
