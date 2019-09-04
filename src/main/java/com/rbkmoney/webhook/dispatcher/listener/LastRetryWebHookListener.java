@@ -3,7 +3,6 @@ package com.rbkmoney.webhook.dispatcher.listener;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.filter.TimeDispatchFilter;
 import com.rbkmoney.webhook.dispatcher.handler.WebHookHandlerImpl;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,25 +12,37 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class LastRetryWebHookListener {
 
     public static final long WAITING_PERIOD = 500L;
-    @Value("${retry.last.seconds}")
-    private final long timeout;
-    @Value("${kafka.topic.webhook.last.retry}")
-    private final String postponedTopic;
 
-    @Value("${retry.third.seconds}")
-    private final long thirdTimeout;
-    @Value("${retry.first.seconds}")
-    private final long firstTimeout;
-    @Value("${retry.second.seconds}")
-    private final long secondTimeout;
+    private long timeout;
+    private String postponedTopic;
+    private long thirdTimeout;
+    private long firstTimeout;
+    private long secondTimeout;
 
     private final WebHookHandlerImpl handler;
     private final TimeDispatchFilter timeDispatchFilter;
     private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
+
+    public LastRetryWebHookListener(@Value("${retry.last.seconds}") long timeout,
+                                    @Value("${kafka.topic.webhook.last.retry}") String postponedTopic,
+                                    @Value("${retry.third.seconds}") long thirdTimeout,
+                                    @Value("${retry.first.seconds}") long firstTimeout,
+                                    @Value("${retry.second.seconds}") long secondTimeout,
+                                    WebHookHandlerImpl handler,
+                                    TimeDispatchFilter timeDispatchFilter,
+                                    KafkaTemplate<String, WebhookMessage> kafkaTemplate) {
+        this.timeout = timeout;
+        this.postponedTopic = postponedTopic;
+        this.thirdTimeout = thirdTimeout;
+        this.firstTimeout = firstTimeout;
+        this.secondTimeout = secondTimeout;
+        this.handler = handler;
+        this.timeDispatchFilter = timeDispatchFilter;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     @KafkaListener(topics = "${kafka.topic.webhook.last.retry}", containerFactory = "kafkaLastRetryListenerContainerFactory")
     public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
