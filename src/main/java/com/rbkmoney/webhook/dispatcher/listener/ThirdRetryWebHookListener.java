@@ -16,14 +16,20 @@ public class ThirdRetryWebHookListener {
 
     @Value("${retry.third.seconds}")
     private long timeout;
+    @Value("${retry.first.seconds}")
+    private long firstTimeout;
+    @Value("${retry.second.seconds}")
+    private long secondTimeout;
+
     @Value("${kafka.topic.webhook.last.retry}")
     private String postponedTopic;
-
     private final RetryHandler handler;
 
     @KafkaListener(topics = "${kafka.topic.webhook.third.retry}", containerFactory = "kafkaThirdRetryListenerContainerFactory")
     public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
-        handler.handle(postponedTopic, acknowledgment, webhookMessage, timeout);
+        log.info("Third retry sourceId: {} webhookId: {} eventId: {}", webhookMessage.getSourceId(),
+                webhookMessage.getWebhookId(), webhookMessage.getEventId());
+        handler.handle(postponedTopic, acknowledgment, webhookMessage, timeout + firstTimeout + secondTimeout);
     }
 
 }

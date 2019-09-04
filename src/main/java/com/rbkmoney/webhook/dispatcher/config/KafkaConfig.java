@@ -18,6 +18,7 @@ import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.LoggingErrorHandler;
+import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
 
 import java.io.File;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 1000);
         sslConfigure(props);
         return props;
     }
@@ -98,7 +100,7 @@ public class KafkaConfig {
     private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> createFactory(ConsumerFactory<String, WebhookMessage> consumerFactory, int concurrency) {
         ConcurrentKafkaListenerContainerFactory<String, WebhookMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
-        factory.setErrorHandler(new LoggingErrorHandler());
+        factory.setErrorHandler(new SeekToCurrentErrorHandler());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         factory.setConcurrency(concurrency);
         return factory;
