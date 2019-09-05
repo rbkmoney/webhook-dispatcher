@@ -15,10 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.LoggingErrorHandler;
-import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
+import org.springframework.kafka.listener.*;
 
 import java.io.File;
 import java.util.HashMap;
@@ -100,7 +97,7 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, WebhookMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setErrorHandler(new SeekToCurrentErrorHandler());
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         factory.setConcurrency(concurrency);
         return factory;
     }

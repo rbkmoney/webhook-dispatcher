@@ -3,6 +3,7 @@ package com.rbkmoney.webhook.dispatcher.listener;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.filter.TimeDispatchFilter;
 import com.rbkmoney.webhook.dispatcher.handler.WebHookHandlerImpl;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class LastRetryWebHookListenerTest {
                 .setSourceId(SOURCE_ID);
         Mockito.when(timeDispatchFilter.filter(webhookMessage, 4L)).thenReturn(true);
 
-        lastRetryWebHookListener.listen(webhookMessage, acknowledgment);
+        lastRetryWebHookListener.onMessage(new ConsumerRecord<>("key", 0,0,"d", webhookMessage), acknowledgment);
 
         Assert.assertEquals(2L, webhookMessage.getRetryCount());
         Mockito.verify(handler, Mockito.times(1)).handle(TOPIC, webhookMessage);
@@ -47,7 +48,7 @@ public class LastRetryWebHookListenerTest {
 
         Mockito.when(timeDispatchFilter.filter(webhookMessage, 4L)).thenReturn(false);
 
-        lastRetryWebHookListener.listen(webhookMessage, acknowledgment);
+        lastRetryWebHookListener.onMessage(new ConsumerRecord<>("key", 0,0,"d", webhookMessage), acknowledgment);
 
         Assert.assertEquals(2L, webhookMessage.getRetryCount());
         Mockito.verify(kafkaTemplate, Mockito.times(1)).send(TOPIC, SOURCE_ID, webhookMessage);

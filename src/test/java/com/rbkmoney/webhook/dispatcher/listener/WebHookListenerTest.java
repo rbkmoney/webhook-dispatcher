@@ -9,6 +9,7 @@ import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
 import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherServiceImpl;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

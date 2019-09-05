@@ -30,7 +30,7 @@ import java.util.Properties;
 
 @Slf4j
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {KafkaConfig.class},
+@ContextConfiguration(
         initializers = AbstractKafkaIntegrationTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public abstract class AbstractKafkaIntegrationTest extends DaoTestBase {

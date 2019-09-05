@@ -4,15 +4,18 @@ import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.handler.RetryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.listener.AcknowledgingMessageListener;
+import org.springframework.kafka.listener.ConsumerSeekAware;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ThirdRetryWebHookListener {
+public class ThirdRetryWebHookListener extends RetryConsumerSeekAware implements AcknowledgingMessageListener<String, WebhookMessage>, ConsumerSeekAware {
 
     @Value("${retry.third.seconds}")
     private long timeout;
@@ -26,10 +29,11 @@ public class ThirdRetryWebHookListener {
     private final RetryHandler handler;
 
     @KafkaListener(topics = "${kafka.topic.webhook.third.retry}", containerFactory = "kafkaThirdRetryListenerContainerFactory")
-    public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
+    public void onMessage(ConsumerRecord<String, WebhookMessage> consumerRecord, Acknowledgment acknowledgment) {
+        WebhookMessage webhookMessage = consumerRecord.value();
         log.info("Third retry sourceId: {} webhookId: {} eventId: {}", webhookMessage.getSourceId(),
                 webhookMessage.getWebhookId(), webhookMessage.getEventId());
-        handler.handle(postponedTopic, acknowledgment, webhookMessage, timeout + firstTimeout + secondTimeout);
+        handler.handle(postponedTopic, acknowledgment, consumerRecord, timeout + firstTimeout + secondTimeout,
+                consumerSeekCallback);
     }
-
 }
