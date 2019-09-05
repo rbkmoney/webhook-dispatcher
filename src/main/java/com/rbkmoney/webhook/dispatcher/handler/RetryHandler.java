@@ -37,13 +37,18 @@ public class RetryHandler {
                 log.info("Retry webhookMessage: {} is finished", webhookMessage);
             }
         } else {
-            try {
-                Thread.sleep(WAITING_PERIOD);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            safeSleep();
             log.info("Waiting timeout: {}", timeout);
             consumerSeekCallback.seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
+        }
+    }
+
+    private void safeSleep() {
+        try {
+            Thread.sleep(WAITING_PERIOD);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted exception when sleep!", e);
+            Thread.currentThread().interrupt();
         }
     }
 

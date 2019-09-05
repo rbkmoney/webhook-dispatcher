@@ -54,21 +54,26 @@ public class LastRetryWebHookListener extends RetryConsumerSeekAware implements 
         long retryCount = initRetryCount(webhookMessage);
         long timeout = initTimeout(retryCount);
         if (timeDispatchFilter.filter(webhookMessage, timeout)) {
-                webhookMessage.setRetryCount(++retryCount);
-                handler.handle(postponedTopic, webhookMessage);
-                acknowledgment.acknowledge();
-                log.info("Retry webhookMessage: {} is finished", webhookMessage);
+            webhookMessage.setRetryCount(++retryCount);
+            handler.handle(postponedTopic, webhookMessage);
+            acknowledgment.acknowledge();
+            log.info("Retry webhookMessage: {} is finished", webhookMessage);
         } else {
-                log.warn("Waiting when handle webhookMessage: {}", webhookMessage);
-                kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
-                acknowledgment.acknowledge();
-                log.info("ReSend to retry without count++ topic: {} source_id: {} message: {}", postponedTopic, webhookMessage.source_id, webhookMessage);
-            try {
-                Thread.sleep(WAITING_PERIOD);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            log.warn("Waiting when handle webhookMessage: {}", webhookMessage);
+            kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
+            acknowledgment.acknowledge();
+            log.info("ReSend to retry without count++ topic: {} source_id: {} message: {}", postponedTopic, webhookMessage.source_id, webhookMessage);
+            safeSleep();
             log.info("Waiting timeout: {}", timeout);
+        }
+    }
+
+    private void safeSleep() {
+        try {
+            Thread.sleep(WAITING_PERIOD);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted exception when sleep!", e);
+            Thread.currentThread().interrupt();
         }
     }
 
