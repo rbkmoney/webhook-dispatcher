@@ -4,15 +4,18 @@ import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.filter.TimeDispatchFilter;
 import com.rbkmoney.webhook.dispatcher.handler.WebHookHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.AcknowledgingMessageListener;
+import org.springframework.kafka.listener.ConsumerSeekAware;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class LastRetryWebHookListener {
+public class LastRetryWebHookListener extends RetryConsumerSeekAware implements AcknowledgingMessageListener<String, WebhookMessage>, ConsumerSeekAware {
 
     public static final long WAITING_PERIOD = 500L;
 
@@ -45,29 +48,32 @@ public class LastRetryWebHookListener {
     }
 
     @KafkaListener(topics = "${kafka.topic.webhook.last.retry}", containerFactory = "kafkaLastRetryListenerContainerFactory")
-    public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
+    public void onMessage(ConsumerRecord<String, WebhookMessage> consumerRecord, Acknowledgment acknowledgment) {
+        WebhookMessage webhookMessage = consumerRecord.value();
         log.info("LastRetryWebHookListener webhookMessage: {}", webhookMessage);
+        long retryCount = initRetryCount(webhookMessage);
+        long timeout = initTimeout(retryCount);
+        if (timeDispatchFilter.filter(webhookMessage, timeout)) {
+            webhookMessage.setRetryCount(++retryCount);
+            handler.handle(postponedTopic, webhookMessage);
+            acknowledgment.acknowledge();
+            log.info("Retry webhookMessage: {} is finished", webhookMessage);
+        } else {
+            log.warn("Waiting when handle webhookMessage: {}", webhookMessage);
+            kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
+            acknowledgment.acknowledge();
+            log.info("ReSend to retry without count++ topic: {} source_id: {} message: {}", postponedTopic, webhookMessage.source_id, webhookMessage);
+            safeSleep();
+            log.info("Waiting timeout: {}", timeout);
+        }
+    }
+
+    private void safeSleep() {
         try {
-            long retryCount = initRetryCount(webhookMessage);
-            long timeout = initTimeout(retryCount);
-            if (timeDispatchFilter.filter(webhookMessage, timeout)) {
-                webhookMessage.setRetryCount(++retryCount);
-                handler.handle(postponedTopic, webhookMessage);
-                acknowledgment.acknowledge();
-                log.info("Retry webhookMessage: {} is finished", webhookMessage);
-            } else {
-                log.warn("Waiting when handle webhookMessage: {}", webhookMessage);
-                kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
-                acknowledgment.acknowledge();
-                log.info("ReSend to retry without count++ topic: {} source_id: {} message: {}", postponedTopic, webhookMessage.source_id, webhookMessage);
-                Thread.sleep(WAITING_PERIOD);
-                log.info("Waiting timeout: {}", timeout);
-            }
+            Thread.sleep(WAITING_PERIOD);
         } catch (InterruptedException e) {
-            log.error("InterruptedException when listen webhookMessage: {} ", webhookMessage, e);
+            log.warn("Interrupted exception when sleep!", e);
             Thread.currentThread().interrupt();
-        } catch (Exception e) {
-            log.error("Error when listen webhookMessage: {} ", webhookMessage, e);
         }
     }
 

@@ -22,12 +22,8 @@ public class WebHookListener {
     @KafkaListener(topics = "${kafka.topic.webhook.forward}", containerFactory = "kafkaListenerContainerFactory")
     public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
         log.info("WebHookListener webhook: {}", webhookMessage);
-        try {
-            handler.handle(postponedTopic, webhookMessage);
-            acknowledgment.acknowledge();
-        }  catch (Exception e) {
-            log.error("Error when listen webhook value: {} e: ", webhookMessage, e);
-        }
+        handler.handle(postponedTopic, webhookMessage);
+        acknowledgment.acknowledge();
     }
 
 }
