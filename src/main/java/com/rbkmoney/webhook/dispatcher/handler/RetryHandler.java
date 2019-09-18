@@ -37,9 +37,9 @@ public class RetryHandler {
                 log.info("Retry webhookMessage: {} is finished", webhookMessage);
             }
         } else {
+            consumerSeekCallback.seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
             safeSleep();
             log.info("Waiting timeout: {}", timeout);
-            consumerSeekCallback.seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
         }
     }
 
