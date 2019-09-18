@@ -32,9 +32,8 @@ public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
         HttpPost post = new HttpPost(webhookMessage.getUrl());
         post.setEntity(new ByteArrayEntity(webhookMessage.getRequestBody()));
         post.setHeader(CONTENT_TYPE, webhookMessage.getContentType());
+        webhookMessage.getAdditionalHeaders().forEach(post::addHeader);
         try (CloseableHttpResponse response = client.execute(post)) {
-            webhookMessage.getAdditionalHeaders()
-                    .forEach(post::addHeader);
             int statusCode = response.getStatusLine().getStatusCode();
             byte[] bufferAsByteArray = new byte[RESPONSE_MAX_LENGTH];
             IOUtils.read(response.getEntity().getContent(), bufferAsByteArray, 0, RESPONSE_MAX_LENGTH);
