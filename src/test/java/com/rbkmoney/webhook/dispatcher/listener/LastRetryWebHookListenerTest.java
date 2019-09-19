@@ -1,6 +1,7 @@
 package com.rbkmoney.webhook.dispatcher.listener;
 
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
+import com.rbkmoney.webhook.dispatcher.filter.DeadRetryDispatchFilter;
 import com.rbkmoney.webhook.dispatcher.filter.TimeDispatchFilter;
 import com.rbkmoney.webhook.dispatcher.handler.WebHookHandlerImpl;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -17,11 +18,14 @@ public class LastRetryWebHookListenerTest {
 
     public static final long DEFAULT_TIMEOUT = 1L;
     public static final String TOPIC = "test";
+    public static final String DLQ_TOPIC = "dlqTest";
     public static final String SOURCE_ID = "test";
     @Mock
     private WebHookHandlerImpl handler;
     @Mock
     private TimeDispatchFilter timeDispatchFilter;
+    @Mock
+    private DeadRetryDispatchFilter deadRetryDispatchFilter;
     @Mock
     private KafkaTemplate<String, WebhookMessage> kafkaTemplate;
     @Mock
@@ -34,11 +38,12 @@ public class LastRetryWebHookListenerTest {
 
     @Test
     public void listen() {
-        LastRetryWebHookListener lastRetryWebHookListener = new LastRetryWebHookListener(DEFAULT_TIMEOUT, TOPIC,
-                DEFAULT_TIMEOUT, DEFAULT_TIMEOUT, DEFAULT_TIMEOUT, handler, timeDispatchFilter, kafkaTemplate);
+        LastRetryWebHookListener lastRetryWebHookListener = new LastRetryWebHookListener(DEFAULT_TIMEOUT, TOPIC,DLQ_TOPIC,
+                DEFAULT_TIMEOUT, DEFAULT_TIMEOUT, DEFAULT_TIMEOUT, handler, timeDispatchFilter, kafkaTemplate, deadRetryDispatchFilter);
         WebhookMessage webhookMessage = new WebhookMessage()
                 .setSourceId(SOURCE_ID);
         Mockito.when(timeDispatchFilter.filter(webhookMessage, 4L)).thenReturn(true);
+        Mockito.when(deadRetryDispatchFilter.filter(webhookMessage)).thenReturn(false);
 
         lastRetryWebHookListener.onMessage(new ConsumerRecord<>("key", 0,0,"d", webhookMessage), acknowledgment);
 

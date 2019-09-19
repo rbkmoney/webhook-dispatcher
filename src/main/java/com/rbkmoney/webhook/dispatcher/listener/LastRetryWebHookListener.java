@@ -1,6 +1,7 @@
 package com.rbkmoney.webhook.dispatcher.listener;
 
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
+import com.rbkmoney.webhook.dispatcher.filter.DispatchFilter;
 import com.rbkmoney.webhook.dispatcher.filter.TimeDispatchFilter;
 import com.rbkmoney.webhook.dispatcher.handler.WebHookHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class LastRetryWebHookListener extends RetryConsumerSeekAware implements 
 
     private long timeout;
     private String postponedTopic;
+    private String dlq;
     private long thirdTimeout;
     private long firstTimeout;
     private long secondTimeout;
@@ -28,23 +30,28 @@ public class LastRetryWebHookListener extends RetryConsumerSeekAware implements 
     private final WebHookHandlerImpl handler;
     private final TimeDispatchFilter timeDispatchFilter;
     private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
+    private final DispatchFilter deadRetryDispatchFilter;
 
     public LastRetryWebHookListener(@Value("${retry.last.seconds}") long timeout,
                                     @Value("${kafka.topic.webhook.last.retry}") String postponedTopic,
+                                    @Value("${kafka.topic.webhook.dead.letter.queue}") String dlq,
                                     @Value("${retry.third.seconds}") long thirdTimeout,
                                     @Value("${retry.first.seconds}") long firstTimeout,
                                     @Value("${retry.second.seconds}") long secondTimeout,
                                     WebHookHandlerImpl handler,
                                     TimeDispatchFilter timeDispatchFilter,
-                                    KafkaTemplate<String, WebhookMessage> kafkaTemplate) {
+                                    KafkaTemplate<String, WebhookMessage> kafkaTemplate,
+                                    DispatchFilter deadRetryDispatchFilter) {
         this.timeout = timeout;
         this.postponedTopic = postponedTopic;
+        this.dlq = dlq;
         this.thirdTimeout = thirdTimeout;
         this.firstTimeout = firstTimeout;
         this.secondTimeout = secondTimeout;
         this.handler = handler;
         this.timeDispatchFilter = timeDispatchFilter;
         this.kafkaTemplate = kafkaTemplate;
+        this.deadRetryDispatchFilter = deadRetryDispatchFilter;
     }
 
     @KafkaListener(topics = "${kafka.topic.webhook.last.retry}", containerFactory = "kafkaLastRetryListenerContainerFactory")
@@ -53,7 +60,10 @@ public class LastRetryWebHookListener extends RetryConsumerSeekAware implements 
         log.info("LastRetryWebHookListener webhookMessage: {}", webhookMessage);
         long retryCount = initRetryCount(webhookMessage);
         long timeout = initTimeout(retryCount);
-        if (timeDispatchFilter.filter(webhookMessage, timeout)) {
+        if (deadRetryDispatchFilter.filter(webhookMessage)) {
+            log.warn("Retry time is end for webhookMessage: {}", webhookMessage);
+            kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
+        } else if (timeDispatchFilter.filter(webhookMessage, timeout)) {
             webhookMessage.setRetryCount(++retryCount);
             handler.handle(postponedTopic, webhookMessage);
             acknowledgment.acknowledge();

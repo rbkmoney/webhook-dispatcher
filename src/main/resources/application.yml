@@ -70,5 +70,5 @@ retry:
   first.seconds: 30
   second.seconds: 600
   third.seconds: 1800
-  last.seconds: 6400
+  last.seconds: 3600
   dead.time.hours: 24
