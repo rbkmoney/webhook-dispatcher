@@ -33,9 +33,9 @@ public class RetryHandler {
                 kafkaTemplate.send(topic, webhookMessage.source_id, webhookMessage);
             } else {
                 handler.handle(topic, webhookMessage);
-                acknowledgment.acknowledge();
                 log.info("Retry webhookMessage: {} is finished", webhookMessage);
             }
+            acknowledgment.acknowledge();
         } else {
             consumerSeekCallback.seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
             safeSleep();

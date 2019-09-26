@@ -63,6 +63,7 @@ public class LastRetryWebHookListener extends RetryConsumerSeekAware implements 
         if (deadRetryDispatchFilter.filter(webhookMessage)) {
             log.warn("Retry time is end for webhookMessage: {}", webhookMessage);
             kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
+            acknowledgment.acknowledge();
         } else if (timeDispatchFilter.filter(webhookMessage, timeout)) {
             webhookMessage.setRetryCount(++retryCount);
             handler.handle(postponedTopic, webhookMessage);
