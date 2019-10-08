@@ -25,7 +25,6 @@ public class FirstRetryWebHookListener extends RetryConsumerSeekAware implements
     @Value("${kafka.topic.webhook.second.retry}")
     private String postponedTopic;
 
-
     private final RetryHandler handler;
 
     @KafkaListener(topics = "${kafka.topic.webhook.first.retry}", containerFactory = "kafkaRetryListenerContainerFactory")

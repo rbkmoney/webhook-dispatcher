@@ -24,7 +24,7 @@ public class RetryHandler {
     private static final long WAITING_PERIOD = 500L;
 
     public void handle(String topic, Acknowledgment acknowledgment, ConsumerRecord<String, WebhookMessage> consumerRecord,
-                       Long timeout, ConsumerSeekAware.ConsumerSeekCallback consumerSeekCallback) {
+                       Long timeout, ThreadLocal<ConsumerSeekAware.ConsumerSeekCallback> consumerSeekCallback) {
         WebhookMessage webhookMessage = consumerRecord.value();
         log.info("RetryWebHookHandler webhookMessage: {}", webhookMessage);
         if (timeDispatchFilter.filter(webhookMessage, timeout)) {
@@ -37,7 +37,7 @@ public class RetryHandler {
             }
             acknowledgment.acknowledge();
         } else {
-            consumerSeekCallback.seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
+            consumerSeekCallback.get().seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
             safeSleep();
             log.info("Waiting timeout: {}", timeout);
         }
