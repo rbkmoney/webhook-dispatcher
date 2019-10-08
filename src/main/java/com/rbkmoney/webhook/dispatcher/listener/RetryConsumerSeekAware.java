@@ -7,11 +7,11 @@ import java.util.Map;
 
 public abstract class RetryConsumerSeekAware implements ConsumerSeekAware {
 
-    protected ConsumerSeekAware.ConsumerSeekCallback consumerSeekCallback;
+    protected ThreadLocal<ConsumerSeekAware.ConsumerSeekCallback> consumerSeekCallback;
 
     @Override
     public void registerSeekCallback(ConsumerSeekCallback consumerSeekCallback) {
-        this.consumerSeekCallback = consumerSeekCallback;
+        this.consumerSeekCallback = ThreadLocal.withInitial(() -> consumerSeekCallback);
     }
 
     @Override
