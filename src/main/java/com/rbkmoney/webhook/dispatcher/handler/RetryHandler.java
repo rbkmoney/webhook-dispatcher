@@ -30,9 +30,13 @@ public class RetryHandler {
             handler.handle(topic, webhookMessage);
             acknowledgment.acknowledge();
         } else {
-            consumerSeekCallback.get().seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
-            safeSleep();
-            log.debug("Waiting timeout: {}", timeout);
+            try {
+                consumerSeekCallback.get().seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
+                safeSleep();
+                log.debug("Waiting timeout: {}", timeout);
+            } catch (Exception e) {
+                log.warn("Problem with seek aware e: ", e);
+            }
         }
     }
 

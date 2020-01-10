@@ -13,11 +13,7 @@ public abstract class RetryConsumerSeekAware implements ConsumerSeekAware {
 
     @Override
     public void registerSeekCallback(ConsumerSeekCallback consumerSeekCallback) {
-        try {
             this.consumerSeekCallback = ThreadLocal.withInitial(() -> consumerSeekCallback);
-        } catch (Exception e) {
-            log.warn("Problem with seek aware e: ", e);
-        }
     }
 
     @Override
