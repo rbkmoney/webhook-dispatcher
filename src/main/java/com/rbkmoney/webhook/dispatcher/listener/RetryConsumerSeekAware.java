@@ -13,7 +13,7 @@ public abstract class RetryConsumerSeekAware implements ConsumerSeekAware {
 
     @Override
     public void registerSeekCallback(ConsumerSeekCallback consumerSeekCallback) {
-            this.consumerSeekCallback = ThreadLocal.withInitial(() -> consumerSeekCallback);
+        this.consumerSeekCallback = ThreadLocal.withInitial(() -> consumerSeekCallback);
     }
 
     @Override
