@@ -22,6 +22,7 @@ public class FirstRetryWebHookListener extends RetryConsumerSeekAware implements
 
     @Value("${retry.first.seconds}")
     private long timeout;
+
     @Value("${kafka.topic.webhook.second.retry}")
     private String postponedTopic;
 
@@ -29,9 +30,6 @@ public class FirstRetryWebHookListener extends RetryConsumerSeekAware implements
 
     @KafkaListener(topics = "${kafka.topic.webhook.first.retry}", containerFactory = "kafkaRetryListenerContainerFactory")
     public void onMessage(ConsumerRecord<String, WebhookMessage> consumerRecord, Acknowledgment acknowledgment) {
-        WebhookMessage webhookMessage = consumerRecord.value();
-        log.info("First retry sourceId: {} webhookId: {} eventId: {}", webhookMessage.getSourceId(),
-                webhookMessage.getWebhookId(), webhookMessage.getEventId());
         handler.handle(postponedTopic, acknowledgment, consumerRecord, timeout, consumerSeekCallback);
     }
 

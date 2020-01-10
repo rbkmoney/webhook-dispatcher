@@ -13,7 +13,8 @@ public class PostponedDispatchFilter implements DispatchFilter {
     private final WebHookDao webHookDaoPgImpl;
 
     @Override
-    public Boolean filter(WebhookMessage webhookMessage) {
-        return webhookMessage.getParentEventId() != PARENT_NOT_EXIST_ID && !webHookDaoPgImpl.isParentCommitted(webhookMessage);
+    public boolean filter(WebhookMessage webhookMessage) {
+        return webhookMessage.getParentEventId() != PARENT_NOT_EXIST_ID
+                && !webHookDaoPgImpl.isParentCommitted(webhookMessage);
     }
 }

@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
         "retry.second.seconds=2",
         "retry.third.seconds=3",
         "retry.last.seconds=4",
-        "retry.dead.time.hours=20"
+        "retry.dead.time.hours=1"
 })
 public class WebhookRetryDispatcherApplicationTest extends AbstractKafkaIntegrationTest {
 
@@ -54,9 +54,9 @@ public class WebhookRetryDispatcherApplicationTest extends AbstractKafkaIntegrat
         producer.send(producerRecord).get();
         producer.close();
 
-        Thread.sleep(15000L);
+        Thread.sleep(20000L);
 
-        Mockito.verify(webHookDispatcherService, Mockito.times(6)).dispatch(Mockito.any());
+        Mockito.verify(webHookDispatcherService, Mockito.times(7)).dispatch(Mockito.any());
     }
 
     @NotNull

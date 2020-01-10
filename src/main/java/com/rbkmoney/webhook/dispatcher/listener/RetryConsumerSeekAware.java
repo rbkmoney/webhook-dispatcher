@@ -1,10 +1,12 @@
 package com.rbkmoney.webhook.dispatcher.listener;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.kafka.listener.ConsumerSeekAware;
 
 import java.util.Map;
 
+@Slf4j
 public abstract class RetryConsumerSeekAware implements ConsumerSeekAware {
 
     protected ThreadLocal<ConsumerSeekAware.ConsumerSeekCallback> consumerSeekCallback;

@@ -26,20 +26,17 @@ public class RetryHandler {
     public void handle(String topic, Acknowledgment acknowledgment, ConsumerRecord<String, WebhookMessage> consumerRecord,
                        Long timeout, ThreadLocal<ConsumerSeekAware.ConsumerSeekCallback> consumerSeekCallback) {
         WebhookMessage webhookMessage = consumerRecord.value();
-        log.info("RetryWebHookHandler webhookMessage: {}", webhookMessage);
         if (timeDispatchFilter.filter(webhookMessage, timeout)) {
-            if (postponedDispatchFilter.filter(webhookMessage)) {
-                log.info("Resend to topic: {} webhookMessage: {}", topic, webhookMessage);
-                kafkaTemplate.send(topic, webhookMessage.source_id, webhookMessage);
-            } else {
-                handler.handle(topic, webhookMessage);
-                log.info("Retry webhookMessage: {} is finished", webhookMessage);
-            }
+            handler.handle(topic, webhookMessage);
             acknowledgment.acknowledge();
         } else {
-            consumerSeekCallback.get().seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
-            safeSleep();
-            log.info("Waiting timeout: {}", timeout);
+            try {
+                consumerSeekCallback.get().seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
+                safeSleep();
+                log.debug("Waiting timeout: {}", timeout);
+            } catch (Exception e) {
+                log.warn("Problem with seek aware e: ", e);
+            }
         }
     }
 

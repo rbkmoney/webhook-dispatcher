@@ -67,7 +67,7 @@ public class WebHookDispatcherServiceImplTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("{}")));
+                        .withBody("{\"response\":\"test\"}")));
 
         WebhookMessage webhookMessage = new WebhookMessage();
         webhookMessage.setUrl("http://localhost:8089/test");

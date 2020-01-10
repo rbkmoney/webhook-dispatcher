@@ -4,6 +4,6 @@ import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 
 public interface DispatchFilter {
 
-    Boolean filter(WebhookMessage t);
+    boolean filter(WebhookMessage t);
 
 }

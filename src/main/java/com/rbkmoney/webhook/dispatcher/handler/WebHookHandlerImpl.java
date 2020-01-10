@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import static com.rbkmoney.webhook.dispatcher.utils.WebHookLogUtils.info;
+import static com.rbkmoney.webhook.dispatcher.utils.WebHookLogUtils.warn;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -29,23 +32,26 @@ public class WebHookHandlerImpl implements WebHookHandler {
     public void handle(String postponedTopic, WebhookMessage webhookMessage) {
         try {
             if (deadRetryDispatchFilter.filter(webhookMessage)) {
-                log.warn("Retry time is end for webhookMessage: {}", webhookMessage);
+                warn("Retry time is end for", webhookMessage);
                 kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
             } else if (postponedDispatchFilter.filter(webhookMessage)) {
-                log.info("Resend to topic: {} webhookMessage: {}", postponedTopic, webhookMessage);
+                info("Resend to topic: " + postponedTopic, webhookMessage);
                 kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
             } else {
+                long retryCount = webhookMessage.getRetryCount();
+                webhookMessage.setRetryCount(++retryCount);
+                info("Dispatch", webhookMessage);
                 webHookDispatcherService.dispatch(webhookMessage);
                 webHookDaoPgImpl.commit(webhookMessage);
             }
         } catch (RetryableException e) {
-            log.warn("Error when handle webhookMessage: {}", webhookMessage, e);
+            log.warn("RetryableException when handle e: ", e);
             kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
-            log.info("Send to retry topic: {} source_id: {} message: {}", postponedTopic, webhookMessage.source_id, webhookMessage);
+            info("Send to retry topic: " + postponedTopic, webhookMessage);
         } catch (Exception e) {
-            log.error("Send to dlq webhookMessage: {} by e:", webhookMessage, e);
+            log.error("Exception when handle e:", e);
             kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
-            log.info("Send to dlq topic: {} source_id: {} message: {}", dlq, webhookMessage.source_id, webhookMessage);
+            info("Send to dlq topic: " + dlq, webhookMessage);
         }
     }
 

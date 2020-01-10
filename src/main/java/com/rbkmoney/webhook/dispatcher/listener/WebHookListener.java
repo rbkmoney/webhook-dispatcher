@@ -2,6 +2,7 @@ package com.rbkmoney.webhook.dispatcher.listener;
 
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.handler.WebHookHandler;
+import com.rbkmoney.webhook.dispatcher.utils.WebHookLogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,7 @@ public class WebHookListener {
 
     @KafkaListener(topics = "${kafka.topic.webhook.forward}", containerFactory = "kafkaListenerContainerFactory")
     public void listen(WebhookMessage webhookMessage, Acknowledgment acknowledgment) {
-        log.info("WebHookListener webhook: {}", webhookMessage);
+        WebHookLogUtils.info("WebHookListener", webhookMessage);
         handler.handle(postponedTopic, webhookMessage);
         acknowledgment.acknowledge();
     }

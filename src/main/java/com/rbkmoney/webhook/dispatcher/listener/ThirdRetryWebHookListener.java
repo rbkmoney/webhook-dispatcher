@@ -30,10 +30,8 @@ public class ThirdRetryWebHookListener extends RetryConsumerSeekAware implements
 
     @KafkaListener(topics = "${kafka.topic.webhook.third.retry}", containerFactory = "kafkaThirdRetryListenerContainerFactory")
     public void onMessage(ConsumerRecord<String, WebhookMessage> consumerRecord, Acknowledgment acknowledgment) {
-        WebhookMessage webhookMessage = consumerRecord.value();
-        log.info("Third retry sourceId: {} webhookId: {} eventId: {}", webhookMessage.getSourceId(),
-                webhookMessage.getWebhookId(), webhookMessage.getEventId());
         handler.handle(postponedTopic, acknowledgment, consumerRecord, timeout + firstTimeout + secondTimeout,
                 consumerSeekCallback);
     }
+
 }
