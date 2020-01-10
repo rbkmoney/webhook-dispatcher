@@ -19,7 +19,7 @@ public class DeadRetryDispatchFilter implements DispatchFilter {
     private int deadRetryTimeout;
 
     @Override
-    public Boolean filter(WebhookMessage webhookMessage) {
+    public boolean filter(WebhookMessage webhookMessage) {
         return TimeoutUtils.calculateTimeFromCreated(webhookMessage.getCreatedAt()) > TimeUnit.HOURS.toMillis(deadRetryTimeout)
                 || webHookDaoPgImpl.isCommitted(webhookMessage);
     }

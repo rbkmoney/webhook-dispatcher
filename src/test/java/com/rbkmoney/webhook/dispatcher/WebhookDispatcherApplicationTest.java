@@ -48,6 +48,8 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
 
         String sourceId = "123";
         WebhookMessage webhook = createWebhook(sourceId, Instant.now().toString(), 0);
+        webhook.setRequestBody("{\"test\":\"test\"}".getBytes());
+
         ProducerRecord producerRecord = new ProducerRecord<>(Initializer.WEBHOOK_FORWARD, webhook.source_id, webhook);
         Producer<String, WebhookMessage> producer = createProducer();
 

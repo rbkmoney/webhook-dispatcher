@@ -22,7 +22,6 @@ spring:
     username: @db.user@
     password: @db.password@
     hikari.maximum-pool-size: 10
-    hikari.idle-timeout: 30000
   flyway:
     schemas: wb_dispatch
     url: @db.url@
