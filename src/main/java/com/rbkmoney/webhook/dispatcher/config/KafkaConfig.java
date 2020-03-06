@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.listener.*;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
 
 import java.io.File;
 import java.util.HashMap;
@@ -30,6 +32,10 @@ public class KafkaConfig {
 
     @Value("${kafka.bootstrap.servers}")
     private String bootstrapServers;
+    @Value("${kafka.consumer.max-poll-interval-ms}")
+    private int maxPollIntervalMs;
+    @Value("${kafka.consumer.session-timeout-ms}")
+    private int sessionTimeoutMs;
     @Value("${kafka.ssl.server-password}")
     private String serverStorePassword;
     @Value("${kafka.ssl.server-keystore-location}")
@@ -51,6 +57,8 @@ public class KafkaConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1);
+        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxPollIntervalMs);
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeoutMs);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         sslConfigure(props);
         return props;

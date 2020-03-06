@@ -54,6 +54,9 @@ kafka:
     key-password: kenny
     server-password: kenny12
     server-keystore-location: src/
+  consumer:
+    max-poll-interval-ms: 60000
+    session-timeout-ms: 60000
 
 merchant:
   timeout: 10000
