@@ -33,10 +33,12 @@ public class WebHookHandlerImpl implements WebHookHandler {
         try {
             if (deadRetryDispatchFilter.filter(webhookMessage)) {
                 warn("Retry time is end for", webhookMessage);
-                kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
+                kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage).get();
             } else if (postponedDispatchFilter.filter(webhookMessage)) {
+                long retryCount = webhookMessage.getRetryCount();
+                webhookMessage.setRetryCount(++retryCount);
                 info("Resend to topic: " + postponedTopic, webhookMessage);
-                kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
+                kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage).get();
             } else {
                 long retryCount = webhookMessage.getRetryCount();
                 webhookMessage.setRetryCount(++retryCount);
@@ -46,12 +48,19 @@ public class WebHookHandlerImpl implements WebHookHandler {
             }
         } catch (RetryableException e) {
             log.warn("RetryableException when handle e: ", e);
-            kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage);
+            syncSendMessage(postponedTopic, webhookMessage);
             info("Send to retry topic: " + postponedTopic, webhookMessage);
         } catch (Exception e) {
             log.error("Exception when handle e:", e);
-            kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage);
-            info("Send to dlq topic: " + dlq, webhookMessage);
+            throw new RuntimeException("Exception when handle!", e);
+        }
+    }
+
+    private void syncSendMessage(String postponedTopic, WebhookMessage webhookMessage) {
+        try {
+            kafkaTemplate.send(postponedTopic, webhookMessage.source_id, webhookMessage).get();
+        } catch (Exception e) {
+            throw new RuntimeException("Problem with kafkaTemplate send message!", e);
         }
     }
 

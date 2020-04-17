@@ -9,7 +9,6 @@ import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
 import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherServiceImpl;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -17,6 +16,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.HashMap;
 
@@ -31,6 +32,8 @@ public class WebHookListenerTest {
     private KafkaTemplate<String, WebhookMessage> kafkaTemplate;
     @Mock
     private Acknowledgment acknowledgment;
+    @Mock
+    private ListenableFuture<SendResult<String, WebhookMessage>> result;
 
     @Before
     public void init() {
@@ -50,6 +53,7 @@ public class WebHookListenerTest {
     public void listen() {
 
         Mockito.when(webHookDaoPgImpl.isCommitted(any())).thenReturn(false);
+        Mockito.when(kafkaTemplate.send(any(), any(), any())).thenReturn(result);
 
         WebhookMessage webhookMessage = new WebhookMessage();
         webhookMessage.setUrl("https://webhook.site/e312eefc-54fc-4bca-928e-26f0fc95fc80");
