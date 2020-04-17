@@ -8,7 +8,11 @@ build('webhook-dispatcher', 'java-maven') {
         javaServicePipeline = load("build_utils/jenkins_lib/pipeJavaService.groovy")
     }
 
+    def serviceName = env.REPO_NAME
+    def mvnArgs = '-DjvmArgs="-Xmx256m"'
+    def useJava11 = true
+    def registry = 'dr2.rbkmoney.com'
+    def registryCredsId = 'jenkins_harbor'
 
-    def buildImageTag = "fcf116dd775cc2e91bffb6a36835754e3f2d5321"
-    javaLibPipeline(buildImageTag)
+    javaServicePipeline(serviceName, useJava11, mvnArgs, registry, registryCredsId)
 }
