@@ -18,8 +18,6 @@ public class RetryHandler {
 
     private final WebHookHandlerImpl handler;
     private final TimeDispatchFilter timeDispatchFilter;
-    private final DispatchFilter postponedDispatchFilter;
-    private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
 
     private static final long WAITING_PERIOD = 500L;
 

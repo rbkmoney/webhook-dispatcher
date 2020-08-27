@@ -17,11 +17,11 @@ public class LastRetryWebHookListener extends RetryConsumerSeekAware implements 
 
     public static final int COUNT_FIRST_RETRIES = 3;
 
-    private long timeout;
-    private String postponedTopic;
-    private long thirdTimeout;
-    private long firstTimeout;
-    private long secondTimeout;
+    private final long timeout;
+    private final String postponedTopic;
+    private final long thirdTimeout;
+    private final long firstTimeout;
+    private final long secondTimeout;
 
     private final RetryHandler handler;
 

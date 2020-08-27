@@ -4,8 +4,6 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,18 +17,18 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.assertFalse;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebhookDispatcherApplication.class)
 @TestPropertySource(properties = "merchant.timeout=1")
 public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTest {
 
-    public static final long EVENT_ID = 123L;
     public static final String URL = "http://localhost:8089";
     public static final String APPLICATION_JSON = "application/json";
 
     @Autowired
-    WebHookDao webHookDao;
+    private WebHookDao webHookDao;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8089);
@@ -76,11 +74,10 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
 
         Thread.sleep(4500L);
 
-        Assert.assertFalse(webHookDao.isParentCommitted(webhook));
+        assertFalse(webHookDao.isParentCommitted(webhook));
 
     }
 
-    @NotNull
     private WebhookMessage createWebhook(String sourceId, String createdAt, long eventId) {
         WebhookMessage webhook = new WebhookMessage();
         webhook.setSourceId(sourceId);

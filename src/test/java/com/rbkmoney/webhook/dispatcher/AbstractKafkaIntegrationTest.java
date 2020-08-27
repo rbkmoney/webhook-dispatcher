@@ -1,7 +1,6 @@
 package com.rbkmoney.webhook.dispatcher;
 
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
-import com.rbkmoney.webhook.dispatcher.config.KafkaConfig;
 import com.rbkmoney.webhook.dispatcher.dao.DaoTestBase;
 import com.rbkmoney.webhook.dispatcher.serde.WebHookDeserializer;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.jetbrains.annotations.NotNull;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -35,7 +33,7 @@ import java.util.Properties;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public abstract class AbstractKafkaIntegrationTest extends DaoTestBase {
 
-    public static final String KAFKA_DOCKER_VERSION = "5.0.1";
+    private static final String KAFKA_DOCKER_VERSION = "5.0.1";
 
     @ClassRule
     public static KafkaContainer kafka = new KafkaContainer(KAFKA_DOCKER_VERSION).withEmbeddedZookeeper();
@@ -61,8 +59,7 @@ public abstract class AbstractKafkaIntegrationTest extends DaoTestBase {
             initTopic(WEBHOOK_DLQ);
         }
 
-        @NotNull
-        private <T> Consumer<String, T> initTopic(String topicName) {
+        private <T> void initTopic(String topicName) {
             Consumer<String, T> consumer = createConsumer(WebHookDeserializer.class);
             try {
                 consumer.subscribe(Collections.singletonList(topicName));
@@ -71,7 +68,6 @@ public abstract class AbstractKafkaIntegrationTest extends DaoTestBase {
                 log.error("KafkaAbstractTest initialize e: ", e);
             }
             consumer.close();
-            return consumer;
         }
     }
 

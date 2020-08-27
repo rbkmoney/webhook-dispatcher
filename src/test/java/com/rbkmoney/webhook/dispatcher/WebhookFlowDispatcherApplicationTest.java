@@ -1,14 +1,11 @@
 package com.rbkmoney.webhook.dispatcher;
 
-import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
 import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
@@ -18,6 +15,9 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebhookDispatcherApplication.class)
@@ -31,33 +31,28 @@ import java.util.concurrent.ExecutionException;
 })
 public class WebhookFlowDispatcherApplicationTest extends AbstractKafkaIntegrationTest {
 
-    public static final long EVENT_ID = 123L;
-    public static final String URL = "http://localhost:8089";
-    public static final String APPLICATION_JSON = "application/json";
-    public static final String SOURCE_ID = "23";
-
-    @Autowired
-    WebHookDao webHookDao;
+    private static final String URL = "http://localhost:8089";
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String SOURCE_ID = "23";
 
     @MockBean
     private WebHookDispatcherService webHookDispatcherService;
 
     @Test
     public void listenCreatedTimeout() throws ExecutionException, InterruptedException, IOException {
-        Mockito.when(webHookDispatcherService.dispatch(Mockito.any())).thenReturn(200);
+        when(webHookDispatcherService.dispatch(any())).thenReturn(200);
 
         String sourceId = "123";
         WebhookMessage webhook = createWebhook(sourceId, Instant.now().toString(), 0);
         ProducerRecord producerRecord = new ProducerRecord<>(Initializer.WEBHOOK_FORWARD, webhook.source_id, webhook);
         Producer<String, WebhookMessage> producer = createProducer();
 
-        //check dublicates
+        //check duplicates
         producer.send(producerRecord).get();
         producer.send(producerRecord).get();
         producer.close();
         Thread.sleep(4000L);
-        Mockito.verify(webHookDispatcherService, Mockito.times(1)).dispatch(Mockito.any());
-
+        verify(webHookDispatcherService, times(1)).dispatch(any());
 
         //check waiting parent
         Mockito.clearInvocations(webHookDispatcherService);
@@ -69,7 +64,7 @@ public class WebhookFlowDispatcherApplicationTest extends AbstractKafkaIntegrati
         producer.send(producerRecord).get();
 
         Thread.sleep(2000L);
-        Mockito.verify(webHookDispatcherService, Mockito.times(0)).dispatch(Mockito.any());
+        verify(webHookDispatcherService, times(0)).dispatch(any());
         webhook.setParentEventId(-1);
         webhook.setEventId(0);
         producerRecord = new ProducerRecord<>(Initializer.WEBHOOK_FORWARD, webhook.source_id, webhook);
@@ -77,11 +72,9 @@ public class WebhookFlowDispatcherApplicationTest extends AbstractKafkaIntegrati
 
         Thread.sleep(4000L);
 
-        Mockito.verify(webHookDispatcherService, Mockito.times(2)).dispatch(Mockito.any());
-
+        verify(webHookDispatcherService, times(2)).dispatch(any());
     }
 
-    @NotNull
     private WebhookMessage createWebhook(String sourceId, String createdAt, long eventId) {
         WebhookMessage webhook = new WebhookMessage();
         webhook.setSourceId(sourceId);
