@@ -8,6 +8,9 @@ management:
       statsd:
         flavor: etsy
         enabled: false
+  endpoint:
+    health:
+      show-details: always
 
 spring:
   application:
@@ -23,6 +26,7 @@ spring:
     password: @db.password@
     hikari.maximum-pool-size: 10
   flyway:
+    table: schema_version
     schemas: wb_dispatch
     url: @db.url@
 
