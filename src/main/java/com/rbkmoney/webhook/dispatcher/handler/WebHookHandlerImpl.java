@@ -7,7 +7,6 @@ import com.rbkmoney.webhook.dispatcher.filter.DispatchFilter;
 import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -25,15 +24,12 @@ public class WebHookHandlerImpl implements WebHookHandler {
     private final WebHookDao webHookDao;
     private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
 
-    @Value("${kafka.topic.webhook.dead.letter.queue}")
-    private String dlq;
-
     @Override
     public void handle(String postponedTopic, WebhookMessage webhookMessage) {
         try {
             if (deadRetryDispatchFilter.filter(webhookMessage)) {
-                warn("Retry time is end for", webhookMessage);
-                kafkaTemplate.send(dlq, webhookMessage.source_id, webhookMessage).get();
+                warn("Retry time has ended for", webhookMessage);
+                // TODO [a.romanov]: save to DB
             } else if (postponedDispatchFilter.filter(webhookMessage)) {
                 long retryCount = webhookMessage.getRetryCount();
                 webhookMessage.setRetryCount(++retryCount);
@@ -47,12 +43,12 @@ public class WebHookHandlerImpl implements WebHookHandler {
                 webHookDao.commit(webhookMessage);
             }
         } catch (RetryableException e) {
-            log.warn("RetryableException when handle e: ", e);
+            log.warn("RetryableException during webhook handling", e);
             syncSendMessage(postponedTopic, webhookMessage);
             info("Send to retry topic: " + postponedTopic, webhookMessage);
         } catch (Exception e) {
-            log.error("Exception when handle e:", e);
-            throw new RuntimeException("Exception when handle!", e);
+            log.error("Exception during webhook handling", e);
+            throw new RuntimeException("Exception during webhook handling", e);
         }
     }
 

@@ -63,7 +63,7 @@ public class LastRetryWebHookListenerTest {
 
     @Test
     public void listen() throws IOException {
-        LastRetryWebHookListener lastRetryWebHookListener = new LastRetryWebHookListener(DEFAULT_TIMEOUT, TOPIC,
+        LastRetryWebHookListener lastRetryWebHookListener = new LastRetryWebHookListener(TOPIC, DEFAULT_TIMEOUT,
                 DEFAULT_TIMEOUT, DEFAULT_TIMEOUT, DEFAULT_TIMEOUT, handler);
         lastRetryWebHookListener.registerSeekCallback(consumerSeekCallback);
 

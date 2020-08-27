@@ -6,7 +6,6 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
@@ -18,8 +17,7 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebhookDispatcherApplication.class)
@@ -53,7 +51,7 @@ public class WebhookRetryDispatcherApplicationTest extends AbstractKafkaIntegrat
 
         Thread.sleep(20000L);
 
-        verify(webHookDispatcherService, Mockito.times(7)).dispatch(any());
+        verify(webHookDispatcherService, times(7)).dispatch(any());
     }
 
     private WebhookMessage createWebhook(String sourceId, String createdAt, long eventId) {
