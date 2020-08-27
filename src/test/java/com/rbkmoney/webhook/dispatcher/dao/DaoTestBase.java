@@ -2,10 +2,10 @@ package com.rbkmoney.webhook.dispatcher.dao;
 
 import com.rbkmoney.easyway.*;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.junit.ClassRule;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
-import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 @Slf4j
 public abstract class DaoTestBase extends AbstractTestUtils {
 
-    private static TestContainers testContainers = TestContainersBuilder.builderWithTestContainers(TestContainersParameters::new)
+    private static final TestContainers POSTGRES = TestContainersBuilder.builderWithTestContainers(TestContainersParameters::new)
             .addPostgresqlTestContainer()
             .build();
 
@@ -36,7 +36,7 @@ public abstract class DaoTestBase extends AbstractTestUtils {
 
         @Override
         protected void starting(Description description) {
-            testContainers.startTestContainers();
+            POSTGRES.startTestContainers();
         }
 
         @Override
@@ -46,23 +46,23 @@ public abstract class DaoTestBase extends AbstractTestUtils {
 
         @Override
         protected void finished(Description description) {
-            testContainers.stopTestContainers();
+            POSTGRES.stopTestContainers();
         }
     };
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
         @Override
-        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+        public void initialize(@NotNull ConfigurableApplicationContext configurableApplicationContext) {
             TestPropertyValues
-                    .of(testContainers.getEnvironmentProperties(getEnvironmentPropertiesConsumer()))
+                    .of(POSTGRES.getEnvironmentProperties(getEnvironmentPropertiesConsumer()))
                     .applyTo(configurableApplicationContext);
         }
     }
 
     private static Consumer<EnvironmentProperties> getEnvironmentPropertiesConsumer() {
         return environmentProperties -> {
-            PostgreSQLContainer postgreSQLContainer = testContainers.getPostgresqlTestContainer().get();
+            PostgreSQLContainer postgreSQLContainer = POSTGRES.getPostgresqlTestContainer().get();
             environmentProperties.put("spring.datasource.url", postgreSQLContainer.getJdbcUrl());
             environmentProperties.put("spring.datasource.username", postgreSQLContainer.getUsername());
             environmentProperties.put("spring.datasource.password", postgreSQLContainer.getPassword());

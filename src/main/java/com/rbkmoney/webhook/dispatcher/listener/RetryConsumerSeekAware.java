@@ -18,13 +18,11 @@ public abstract class RetryConsumerSeekAware implements ConsumerSeekAware {
 
     @Override
     public void onPartitionsAssigned(Map<TopicPartition, Long> map, ConsumerSeekCallback consumerSeekCallback) {
-
-        // nothing is needed here for this program
+        // do nothing
     }
 
     @Override
     public void onIdleContainer(Map<TopicPartition, Long> map, ConsumerSeekCallback consumerSeekCallback) {
-
-        // nothing is needed here for this program
+        // do nothing
     }
 }

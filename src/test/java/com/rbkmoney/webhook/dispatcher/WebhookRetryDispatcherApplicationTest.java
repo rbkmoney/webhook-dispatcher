@@ -1,15 +1,12 @@
 package com.rbkmoney.webhook.dispatcher;
 
 import com.rbkmoney.kafka.common.exception.RetryableException;
-import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
 import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
@@ -19,6 +16,10 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebhookDispatcherApplication.class)
@@ -32,19 +33,15 @@ import java.util.concurrent.ExecutionException;
 })
 public class WebhookRetryDispatcherApplicationTest extends AbstractKafkaIntegrationTest {
 
-    public static final long EVENT_ID = 123L;
-    public static final String URL = "http://localhost:8089";
-    public static final String APPLICATION_JSON = "application/json";
-
-    @Autowired
-    WebHookDao webHookDao;
+    private static final String URL = "http://localhost:8089";
+    private static final String APPLICATION_JSON = "application/json";
 
     @MockBean
     private WebHookDispatcherService webHookDispatcherService;
 
     @Test
     public void listenCreatedTimeout() throws ExecutionException, InterruptedException, IOException {
-        Mockito.when(webHookDispatcherService.dispatch(Mockito.any())).thenThrow(RetryableException.class);
+        when(webHookDispatcherService.dispatch(any())).thenThrow(RetryableException.class);
 
         String sourceId = "123";
         WebhookMessage webhook = createWebhook(sourceId, Instant.now().toString(), 0);
@@ -56,10 +53,9 @@ public class WebhookRetryDispatcherApplicationTest extends AbstractKafkaIntegrat
 
         Thread.sleep(20000L);
 
-        Mockito.verify(webHookDispatcherService, Mockito.times(7)).dispatch(Mockito.any());
+        verify(webHookDispatcherService, Mockito.times(7)).dispatch(any());
     }
 
-    @NotNull
     private WebhookMessage createWebhook(String sourceId, String createdAt, long eventId) {
         WebhookMessage webhook = new WebhookMessage();
         webhook.setSourceId(sourceId);

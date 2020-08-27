@@ -12,7 +12,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
@@ -22,10 +21,12 @@ import org.springframework.util.concurrent.ListenableFuture;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 public class WebHookListenerTest {
 
-    WebHookListener webHookListener;
+    private WebHookListener webHookListener;
+
     @Mock
     private WebHookDao webHookDaoImpl;
     @Mock
@@ -45,15 +46,18 @@ public class WebHookListenerTest {
                         .setSocketTimeout(60000)
                         .build())
                 .build());
-        webHookListener = new WebHookListener(new WebHookHandlerImpl(webHookDispatcherService, new PostponedDispatchFilter(webHookDaoImpl),
-                new DeadRetryDispatchFilter(webHookDaoImpl), webHookDaoImpl, kafkaTemplate));
+
+        webHookListener = new WebHookListener(
+                new WebHookHandlerImpl(
+                        webHookDispatcherService,
+                        new PostponedDispatchFilter(webHookDaoImpl),
+                        new DeadRetryDispatchFilter(webHookDaoImpl), webHookDaoImpl, kafkaTemplate));
     }
 
     @Test
     public void listen() {
-
-        Mockito.when(webHookDaoImpl.isCommitted(any())).thenReturn(false);
-        Mockito.when(kafkaTemplate.send(any(), any(), any())).thenReturn(result);
+        when(webHookDaoImpl.isCommitted(any())).thenReturn(false);
+        when(kafkaTemplate.send(any(), any(), any())).thenReturn(result);
 
         WebhookMessage webhookMessage = new WebhookMessage();
         webhookMessage.setUrl("https://webhook.site/e312eefc-54fc-4bca-928e-26f0fc95fc80");
@@ -61,7 +65,10 @@ public class WebHookListenerTest {
         webhookMessage.setSourceId("547839");
         HashMap<String, String> additionalHeaders = new HashMap<>();
         additionalHeaders.put("Content-Signature", "alg=RS256");
-        additionalHeaders.put("digest", "AKIYypDF5jWuNT4aO6OvsWNuzS7e1ztUEVmLwSwaq2Q4j2ckwVJxxz6L1nFQbWZr9Bh8p-hkuKf7MhKZlOKLkhClzDseW-GpJpyhrGnzFHFO78dxbjB8Z82zC5CVJk8PZa-ZxZ2MvoQWTAsPPWVXxJ64A7_tgYiIrSZkjyROwraj1-MG0iRA_a9bkXiwRelNj8mZIv38PneVPl1UAwpMaGs7pQmwaBv-M64Jm8rTd80WiRdOkp8G_hwPQdFo9lOhOxtUk9K5SoBfjKXQ0Dku7X2TpKfTQxHfB1mqm9L8DkK0NXopowqtZI4UB7TTFUIOOSI3SGpv3hyC2uYeTvnJWw==");
+        additionalHeaders.put("digest", "AKIYypDF5jWuNT4aO6OvsWNuzS7e1ztUEVmLwSwaq2Q4j2ckwVJxxz6L1nFQbWZr9Bh8p-hkuKf7Mh" +
+                "KZlOKLkhClzDseW-GpJpyhrGnzFHFO78dxbjB8Z82zC5CVJk8PZa-ZxZ2MvoQWTAsPPWVXxJ64A7_tgYiIrSZkjyROwraj1-MG0iRA" +
+                "_a9bkXiwRelNj8mZIv38PneVPl1UAwpMaGs7pQmwaBv-M64Jm8rTd80WiRdOkp8G_hwPQdFo9lOhOxtUk9K5SoBfjKXQ0Dku7X2TpK" +
+                "fTQxHfB1mqm9L8DkK0NXopowqtZI4UB7TTFUIOOSI3SGpv3hyC2uYeTvnJWw==");
         webhookMessage.setAdditionalHeaders(additionalHeaders);
         webhookMessage.setContentType("application/json");
         webhookMessage.setParentEventId(-1L);

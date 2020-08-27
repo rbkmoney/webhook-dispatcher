@@ -23,8 +23,6 @@ import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 @RequiredArgsConstructor
 public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
 
-    public static final int RESPONSE_MAX_LENGTH = 4096;
-
     private final CloseableHttpClient client;
 
     @Override

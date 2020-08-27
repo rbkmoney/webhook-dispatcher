@@ -1,6 +1,5 @@
 package com.rbkmoney.webhook.dispatcher.service;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.matching.EqualToPattern;
 import com.rbkmoney.kafka.common.exception.RetryableException;
@@ -13,7 +12,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -21,9 +19,12 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 public class WebHookDispatcherServiceImplTest {
 
-    public static final String ALG_RS_256 = "alg=RS256";
-    public static final String DIGEST = "oOg_wGfM3esi5aAmu4fnik6DRISvusM2r99i7iyQapkL_5Q30riAD6jSr9LOearJea6053JjodQ7vVIPsTDb1pnZ4thSe7qLU_JzyL_q-LCQXWyGVBXpIyt5fN-1yRNr-Bl1hpnmc5JpNWuNvZdqpoPkvrW4vaNUmLgXqgtpgyHIxQDMZVLnAmzXBCvWggqORPpZ_6J1oNbh1QqEBC9CqDU94d8GthzqxH3V7nIPdpYmg8VxbR9k5SGXf8zbIDWxWMzVfKQF4B1B1CtO46loD70cmOX2kMl32WJa_XSV8Ep1ajDnouLyxk4eN-F-Fb1XkUWUJPw0JkKAVhp2F4NxzQ==";
-    private CloseableHttpClient httpClient;
+    private static final String ALG_RS_256 = "alg=RS256";
+    private static final String DIGEST = "oOg_wGfM3esi5aAmu4fnik6DRISvusM2r99i7iyQapkL_5Q30riAD6jSr9LOearJea6053JjodQ7v" +
+            "VIPsTDb1pnZ4thSe7qLU_JzyL_q-LCQXWyGVBXpIyt5fN-1yRNr-Bl1hpnmc5JpNWuNvZdqpoPkvrW4vaNUmLgXqgtpgyHIxQDMZVLnAmz" +
+            "XBCvWggqORPpZ_6J1oNbh1QqEBC9CqDU94d8GthzqxH3V7nIPdpYmg8VxbR9k5SGXf8zbIDWxWMzVfKQF4B1B1CtO46loD70cmOX2kMl32" +
+            "WJa_XSV8Ep1ajDnouLyxk4eN-F-Fb1XkUWUJPw0JkKAVhp2F4NxzQ==";
+
     private WebHookDispatcherServiceImpl webHookDispatcherService;
 
     @Rule
@@ -35,14 +36,14 @@ public class WebHookDispatcherServiceImplTest {
                 .setConnectTimeout(1000)
                 .setConnectionRequestTimeout(1000)
                 .setSocketTimeout(1000).build();
-        httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+        CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
         webHookDispatcherService = new WebHookDispatcherServiceImpl(httpClient);
     }
 
 
     @Test(expected = RetryableException.class)
-    public void dispatchError() throws IOException {
-        stubFor(WireMock.post(urlEqualTo("/test"))
+    public void dispatchError() {
+        stubFor(post(urlEqualTo("/test"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withFixedDelay(20000)
@@ -59,8 +60,8 @@ public class WebHookDispatcherServiceImplTest {
     }
 
     @Test
-    public void dispatch() throws IOException {
-        stubFor(WireMock.post(urlEqualTo("/test"))
+    public void dispatch() {
+        stubFor(post(urlEqualTo("/test"))
                 .withHeader(CONTENT_TYPE, new EqualToPattern(ContentType.APPLICATION_JSON.getMimeType()))
                 .withHeader("Content-Signature", new EqualToPattern(ALG_RS_256))
                 .withHeader("digest", new EqualToPattern(DIGEST))
