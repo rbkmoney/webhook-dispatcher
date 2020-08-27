@@ -6,12 +6,12 @@ import com.github.tomakehurst.wiremock.matching.EqualToPattern;
 import com.rbkmoney.kafka.common.exception.RetryableException;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testcontainers.shaded.org.apache.http.entity.ContentType;
 
 import java.io.IOException;
 import java.util.HashMap;
