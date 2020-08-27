@@ -18,7 +18,7 @@ import java.time.Instant;
 public class DeadRetryDispatchFilterTest {
 
     @MockBean
-    WebHookDao webHookDaoPgImpl;
+    WebHookDao webHookDao;
 
     @Autowired
     DeadRetryDispatchFilter dispatchFilter;
@@ -27,21 +27,21 @@ public class DeadRetryDispatchFilterTest {
     public void filter() {
         WebhookMessage webhookMessage = new WebhookMessage();
         webhookMessage.setCreatedAt(Instant.now().minusSeconds(60 * 60 * 24 + 1).toString());
-        Mockito.when(webHookDaoPgImpl.isCommitted(webhookMessage)).thenReturn(true);
+        Mockito.when(webHookDao.isCommitted(webhookMessage)).thenReturn(true);
         Boolean filter = dispatchFilter.filter(webhookMessage);
 
         Assert.assertTrue(filter);
 
         webhookMessage = new WebhookMessage();
         webhookMessage.setCreatedAt(Instant.now().minusSeconds(60 * 60 * 24 + 1).toString());
-        Mockito.when(webHookDaoPgImpl.isCommitted(webhookMessage)).thenReturn(false);
+        Mockito.when(webHookDao.isCommitted(webhookMessage)).thenReturn(false);
         filter = dispatchFilter.filter(webhookMessage);
 
         Assert.assertTrue(filter);
 
         webhookMessage = new WebhookMessage();
         webhookMessage.setCreatedAt(Instant.now().minusSeconds(60 * 60 * 23).toString());
-        Mockito.when(webHookDaoPgImpl.isCommitted(webhookMessage)).thenReturn(false);
+        Mockito.when(webHookDao.isCommitted(webhookMessage)).thenReturn(false);
         filter = dispatchFilter.filter(webhookMessage);
 
         Assert.assertFalse(filter);

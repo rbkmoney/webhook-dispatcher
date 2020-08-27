@@ -1,102 +1,62 @@
 package com.rbkmoney.webhook.dispatcher.dao;
 
-import com.basho.riak.client.api.RiakClient;
-import com.basho.riak.client.api.cap.Quorum;
-import com.basho.riak.client.api.commands.kv.FetchValue;
-import com.basho.riak.client.api.commands.kv.StoreValue;
-import com.basho.riak.client.core.query.Location;
-import com.basho.riak.client.core.query.Namespace;
-import com.basho.riak.client.core.query.RiakObject;
-import com.basho.riak.client.core.util.BinaryValue;
+import com.rbkmoney.kafka.common.exception.RetryableException;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.exception.RiakExecutionException;
 import com.rbkmoney.webhook.dispatcher.utils.KeyGenerator;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
+import org.springframework.stereotype.Service;
+
+import javax.sql.DataSource;
 
 @Slf4j
-//@Component
-@RequiredArgsConstructor
-public class WebHookDaoImpl implements WebHookDao {
+@Service
+public class WebHookDaoImpl extends NamedParameterJdbcDaoSupport implements WebHookDao {
 
-    public static final String DELIMETER = "_";
-    private final RiakClient client;
+    private static final String ID = "id";
 
-    @Value("${riak.bucket}")
-    private String bucket;
+    public WebHookDaoImpl(DataSource ds) {
+        setDataSource(ds);
+    }
 
     @Override
     public void commit(WebhookMessage webhookMessage) {
         try {
-            log.info("WebHookDaoImpl create in bucket: {} webHook: {}", bucket, webhookMessage);
-            RiakObject quoteObject = new RiakObject()
-                    .setContentType(MediaType.TEXT_PLAIN_VALUE)
-                    .setValue(BinaryValue.create(webhookMessage.url));
             String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
-            Location quoteObjectLocation = createLocation(bucket, key);
-            StoreValue storeOp = new StoreValue.Builder(quoteObject)
-                    .withOption(StoreValue.Option.W, Quorum.oneQuorum())
-                    .withLocation(quoteObjectLocation)
-                    .build();
-            client.execute(storeOp);
-        } catch (InterruptedException e) {
-            log.error("InterruptedException in ListRepository when create e: ", e);
-            Thread.currentThread().interrupt();
-            throw new RiakExecutionException(e);
+            log.info("WebHookDaoImpl commit key: {}", key);
+            String sqlQuery = "insert into wb_dispatch.commit_log(id) values (?)";
+            getJdbcTemplate().update(sqlQuery, key);
         } catch (Exception e) {
-            log.error("Exception in ListRepository when create e: ", e);
-            throw new RiakExecutionException(e);
+            log.error("Exception in WebHookDao when commit e: ", e);
+            throw new RetryableException(e);
         }
     }
 
     @Override
     public Boolean isParentCommitted(WebhookMessage webhookMessage) {
-        try {
-            String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getParentEventId());
-            log.info("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
-            Location quoteObjectLocation = createLocation(bucket, key);
-            return isObjectExist(quoteObjectLocation);
-        } catch (InterruptedException e) {
-            log.error("InterruptedException in WebHookDaoImpl when get e: ", e);
-            Thread.currentThread().interrupt();
-            throw new RiakExecutionException(e);
-        } catch (Exception e) {
-            log.error("Exception in WebHookDaoImpl when get e: ", e);
-            throw new RiakExecutionException(e);
-        }
-    }
-
-    private boolean isObjectExist(Location quoteObjectLocation) throws java.util.concurrent.ExecutionException, InterruptedException {
-        FetchValue fetch = new FetchValue.Builder(quoteObjectLocation)
-                .withOption(FetchValue.Option.R, new Quorum(3))
-                .build();
-        FetchValue.Response response = client.execute(fetch);
-        RiakObject obj = response.getValue(RiakObject.class);
-        return obj != null && obj.getValue() != null;
+        String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getParentEventId());
+        return checkIsCommit(webhookMessage, key);
     }
 
     @Override
     public Boolean isCommitted(WebhookMessage webhookMessage) {
-        try {
-            String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
-            log.info("WebHookDaoImpl get bucket: {} key: {}", bucket, key);
-            Location quoteObjectLocation = createLocation(bucket, key);
-            return isObjectExist(quoteObjectLocation);
-        } catch (InterruptedException e) {
-            log.error("InterruptedException in WebHookDaoImpl when get e: ", e);
-            Thread.currentThread().interrupt();
-            throw new RiakExecutionException(e);
-        } catch (Exception e) {
-            log.error("Exception in WebHookDaoImpl when get e: ", e);
-            throw new RiakExecutionException(e);
-        }
+        String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
+        return checkIsCommit(webhookMessage, key);
     }
 
-    private Location createLocation(String bucketName, String key) {
-        Namespace quotesBucket = new Namespace(bucketName);
-        return new Location(quotesBucket, key);
+    private Boolean checkIsCommit(WebhookMessage webhookMessage, String key) {
+        try {
+            String sqlQuery = "SELECT EXISTS (" +
+                    "select * from wb_dispatch.commit_log where id = :id" +
+                    ")";
+            MapSqlParameterSource params = new MapSqlParameterSource(ID, key);
+            Boolean isExist = getNamedParameterJdbcTemplate().queryForObject(sqlQuery, params, Boolean.class);
+            log.info("Row for source_id: {} hook_id: {}  with key: {} is exist: {}", webhookMessage.getSourceId(), webhookMessage.getWebhookId(), key, isExist);
+            return isExist;
+        } catch (Exception e) {
+            log.error("Exception when find parent event ", e);
+            throw new RetryableException(e);
+        }
     }
 }

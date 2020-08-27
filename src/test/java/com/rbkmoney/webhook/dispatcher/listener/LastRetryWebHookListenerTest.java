@@ -46,14 +46,14 @@ public class LastRetryWebHookListenerTest {
     @Mock
     private Acknowledgment acknowledgment;
     @Mock
-    private WebHookDao webHookDaoPgImpl;
+    private WebHookDao webHookDao;
     @Mock
     private ConsumerSeekAware.ConsumerSeekCallback consumerSeekCallback;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        WebHookHandlerImpl handler = new WebHookHandlerImpl(webHookDispatcherService, postponedDispatchFilter, deadRetryDispatchFilter, webHookDaoPgImpl, kafkaTemplate);
+        WebHookHandlerImpl handler = new WebHookHandlerImpl(webHookDispatcherService, postponedDispatchFilter, deadRetryDispatchFilter, webHookDao, kafkaTemplate);
         this.handler = new RetryHandler(handler, timeDispatchFilter, deadRetryDispatchFilter, kafkaTemplate);
     }
 
@@ -68,7 +68,7 @@ public class LastRetryWebHookListenerTest {
         Mockito.when(timeDispatchFilter.filter(webhookMessage, 4L)).thenReturn(true);
         Mockito.when(deadRetryDispatchFilter.filter(webhookMessage)).thenReturn(false);
         Mockito.when(postponedDispatchFilter.filter(webhookMessage)).thenReturn(false);
-        Mockito.doNothing().when(webHookDaoPgImpl).commit(webhookMessage);
+        Mockito.doNothing().when(webHookDao).commit(webhookMessage);
 
         ConsumerRecord<String, WebhookMessage> consumerRecord = new ConsumerRecord<>("key", 0, 0, "d", webhookMessage);
         lastRetryWebHookListener.onMessage(consumerRecord, acknowledgment);
