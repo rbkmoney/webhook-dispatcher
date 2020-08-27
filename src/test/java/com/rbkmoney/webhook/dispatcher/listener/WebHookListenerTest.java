@@ -27,7 +27,7 @@ public class WebHookListenerTest {
 
     WebHookListener webHookListener;
     @Mock
-    private WebHookDao webHookDaoPgImpl;
+    private WebHookDao webHookDaoImpl;
     @Mock
     private KafkaTemplate<String, WebhookMessage> kafkaTemplate;
     @Mock
@@ -45,14 +45,14 @@ public class WebHookListenerTest {
                         .setSocketTimeout(60000)
                         .build())
                 .build());
-        webHookListener = new WebHookListener(new WebHookHandlerImpl(webHookDispatcherService, new PostponedDispatchFilter(webHookDaoPgImpl),
-                new DeadRetryDispatchFilter(webHookDaoPgImpl), webHookDaoPgImpl, kafkaTemplate));
+        webHookListener = new WebHookListener(new WebHookHandlerImpl(webHookDispatcherService, new PostponedDispatchFilter(webHookDaoImpl),
+                new DeadRetryDispatchFilter(webHookDaoImpl), webHookDaoImpl, kafkaTemplate));
     }
 
     @Test
     public void listen() {
 
-        Mockito.when(webHookDaoPgImpl.isCommitted(any())).thenReturn(false);
+        Mockito.when(webHookDaoImpl.isCommitted(any())).thenReturn(false);
         Mockito.when(kafkaTemplate.send(any(), any(), any())).thenReturn(result);
 
         WebhookMessage webhookMessage = new WebhookMessage();

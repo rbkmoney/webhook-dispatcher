@@ -37,7 +37,7 @@ public class WebhookFlowDispatcherApplicationTest extends AbstractKafkaIntegrati
     public static final String SOURCE_ID = "23";
 
     @Autowired
-    WebHookDao webHookDaoPgImpl;
+    WebHookDao webHookDao;
 
     @MockBean
     private WebHookDispatcherService webHookDispatcherService;

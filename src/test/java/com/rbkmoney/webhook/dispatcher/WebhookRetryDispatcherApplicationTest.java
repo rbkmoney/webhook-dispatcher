@@ -37,7 +37,7 @@ public class WebhookRetryDispatcherApplicationTest extends AbstractKafkaIntegrat
     public static final String APPLICATION_JSON = "application/json";
 
     @Autowired
-    WebHookDao webHookDaoPgImpl;
+    WebHookDao webHookDao;
 
     @MockBean
     private WebHookDispatcherService webHookDispatcherService;

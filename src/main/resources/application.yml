@@ -67,11 +67,6 @@ merchant:
   max.per.route: 2
   max.total: 40
 
-riak:
-  address: localhost
-  port: 8087
-  bucket: webhook
-
 retry:
   first.seconds: 30
   second.seconds: 600

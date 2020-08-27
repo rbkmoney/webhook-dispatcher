@@ -30,7 +30,7 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
     public static final String APPLICATION_JSON = "application/json";
 
     @Autowired
-    WebHookDao webHookDaoPgImpl;
+    WebHookDao webHookDao;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8089);
@@ -76,7 +76,7 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
 
         Thread.sleep(4500L);
 
-        Assert.assertFalse(webHookDaoPgImpl.isParentCommitted(webhook));
+        Assert.assertFalse(webHookDao.isParentCommitted(webhook));
 
     }
 

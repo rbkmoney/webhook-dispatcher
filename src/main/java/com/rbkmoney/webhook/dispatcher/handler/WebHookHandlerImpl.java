@@ -22,7 +22,7 @@ public class WebHookHandlerImpl implements WebHookHandler {
     private final WebHookDispatcherService webHookDispatcherService;
     private final DispatchFilter postponedDispatchFilter;
     private final DispatchFilter deadRetryDispatchFilter;
-    private final WebHookDao webHookDaoPgImpl;
+    private final WebHookDao webHookDao;
     private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
 
     @Value("${kafka.topic.webhook.dead.letter.queue}")
@@ -44,7 +44,7 @@ public class WebHookHandlerImpl implements WebHookHandler {
                 webhookMessage.setRetryCount(++retryCount);
                 info("Dispatch", webhookMessage);
                 webHookDispatcherService.dispatch(webhookMessage);
-                webHookDaoPgImpl.commit(webhookMessage);
+                webHookDao.commit(webhookMessage);
             }
         } catch (RetryableException e) {
             log.warn("RetryableException when handle e: ", e);
