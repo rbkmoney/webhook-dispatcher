@@ -29,7 +29,7 @@ public class WebHookHandlerImpl implements WebHookHandler {
         try {
             if (deadRetryDispatchFilter.filter(webhookMessage)) {
                 warn("Retry time has ended for", webhookMessage);
-                // TODO [a.romanov]: save to DB
+                webHookDao.bury(webhookMessage);
             } else if (postponedDispatchFilter.filter(webhookMessage)) {
                 long retryCount = webhookMessage.getRetryCount();
                 webhookMessage.setRetryCount(++retryCount);
