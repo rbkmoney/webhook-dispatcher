@@ -22,13 +22,28 @@ public class WebHookDaoImpl extends NamedParameterJdbcDaoSupport implements WebH
 
     @Override
     public void commit(WebhookMessage webhookMessage) {
+        String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
+
         try {
-            String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
-            log.info("WebHookDaoImpl commit key: {}", key);
-            String sqlQuery = "insert into wb_dispatch.commit_log(id) values (?)";
+            log.info("Commit webhook with key={}", key);
+            String sqlQuery = "INSERT INTO wb_dispatch.commit_log(id) VALUES (?)";
             getJdbcTemplate().update(sqlQuery, key);
         } catch (Exception e) {
-            log.error("Exception in WebHookDao when commit e: ", e);
+            log.error("Exception during committing webhook with key={}", key, e);
+            throw new RetryableException(e);
+        }
+    }
+
+    @Override
+    public void bury(WebhookMessage webhookMessage) {
+        String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
+
+        try {
+            log.info("Bury webhook with key={}", key);
+            String sqlQuery = ""; // TODO [a.romanov]: save webhookMessage to DB
+            getJdbcTemplate().update(sqlQuery, key);
+        } catch (Exception e) {
+            log.error("Exception during burying webhook with key={}", key, e);
             throw new RetryableException(e);
         }
     }
@@ -48,14 +63,15 @@ public class WebHookDaoImpl extends NamedParameterJdbcDaoSupport implements WebH
     private Boolean checkIsCommit(WebhookMessage webhookMessage, String key) {
         try {
             String sqlQuery = "SELECT EXISTS (" +
-                    "select * from wb_dispatch.commit_log where id = :id" +
+                    "SELECT * FROM wb_dispatch.commit_log WHERE id = :id" +
                     ")";
             MapSqlParameterSource params = new MapSqlParameterSource(ID, key);
             Boolean isExist = getNamedParameterJdbcTemplate().queryForObject(sqlQuery, params, Boolean.class);
-            log.info("Row for source_id: {} hook_id: {}  with key: {} is exist: {}", webhookMessage.getSourceId(), webhookMessage.getWebhookId(), key, isExist);
+            log.info("Row for source_id={}, hook_id={} with key={} is already exists: {}",
+                    webhookMessage.getSourceId(), webhookMessage.getWebhookId(), key, isExist);
             return isExist;
         } catch (Exception e) {
-            log.error("Exception when find parent event ", e);
+            log.error("Exception during looking for parent event with key={}", key, e);
             throw new RetryableException(e);
         }
     }
