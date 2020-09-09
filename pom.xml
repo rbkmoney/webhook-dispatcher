@@ -77,6 +77,11 @@
             <artifactId>custom-actuator-endpoints</artifactId>
             <version>0.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.rbkmoney.geck</groupId>
+            <artifactId>serializer</artifactId>
+            <version>0.6.11</version>
+        </dependency>
 
         <!--spring-->
         <dependency>
