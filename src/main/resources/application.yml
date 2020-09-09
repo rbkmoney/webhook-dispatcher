@@ -18,6 +18,11 @@ spring:
   output:
     ansi:
       enabled: always
+  jpa:
+    database: postgresql
+    properties:
+      hibernate:
+        default_schema: wb_dispatch
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
@@ -29,6 +34,9 @@ spring:
     table: schema_version
     schemas: wb_dispatch
     url: @db.url@
+
+hibernate:
+  physical_naming_strategy: com.rbkmoney.webhook.dispatcher.entity.naming.SnakeCaseNamingStrategy
 
 info:
   version: @project.version@
