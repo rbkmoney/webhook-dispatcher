@@ -2,6 +2,7 @@ package com.rbkmoney.webhook.dispatcher.dao;
 
 import com.rbkmoney.kafka.common.exception.RetryableException;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
+import com.rbkmoney.webhook.dispatcher.converter.WebhookMessageConverter;
 import com.rbkmoney.webhook.dispatcher.utils.KeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -16,8 +17,13 @@ public class WebHookDaoImpl extends NamedParameterJdbcDaoSupport implements WebH
 
     private static final String ID = "id";
 
-    public WebHookDaoImpl(DataSource ds) {
+    private final WebhookMessageConverter webhookMessageConverter;
+
+    public WebHookDaoImpl(
+            DataSource ds,
+            WebhookMessageConverter webhookMessageConverter) {
         setDataSource(ds);
+        this.webhookMessageConverter = webhookMessageConverter;
     }
 
     @Override
@@ -40,8 +46,11 @@ public class WebHookDaoImpl extends NamedParameterJdbcDaoSupport implements WebH
 
         try {
             log.info("Bury webhook with key={}", key);
-            String sqlQuery = ""; // TODO [a.romanov]: save webhookMessage to DB
-            getJdbcTemplate().update(sqlQuery, key);
+            String sqlQuery = "INSERT INTO wb_dispatch.dead_hooks(id, webhook_id, source_id, event_id, parent_event_id, " +
+                    "created_at, url, content_type, additional_headers, request_body, retry_count) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            MapSqlParameterSource params = webhookMessageConverter.convert(webhookMessage, key);
+            getNamedParameterJdbcTemplate().update(sqlQuery, params);
         } catch (Exception e) {
             log.error("Exception during burying webhook with key={}", key, e);
             throw new RetryableException(e);
