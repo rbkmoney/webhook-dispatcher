@@ -20,11 +20,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.function.Consumer;
 
+@Slf4j
+@DirtiesContext
 @RunWith(SpringRunner.class)
 @EnableConfigurationProperties({DataSourceProperties.class})
 @ContextConfiguration(classes = {DataSourceAutoConfiguration.class}, initializers = DaoTestBase.Initializer.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@Slf4j
 public abstract class DaoTestBase extends AbstractTestUtils {
 
     private static final TestContainers POSTGRES = TestContainersBuilder.builderWithTestContainers(TestContainersParameters::new)

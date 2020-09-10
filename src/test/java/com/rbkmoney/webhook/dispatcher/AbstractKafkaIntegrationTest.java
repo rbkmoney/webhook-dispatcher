@@ -28,9 +28,8 @@ import java.util.Properties;
 
 @Slf4j
 @RunWith(SpringRunner.class)
-@ContextConfiguration(
-        initializers = AbstractKafkaIntegrationTest.Initializer.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@DirtiesContext
+@ContextConfiguration(initializers = AbstractKafkaIntegrationTest.Initializer.class)
 public abstract class AbstractKafkaIntegrationTest extends DaoTestBase {
 
     private static final String KAFKA_DOCKER_VERSION = "5.0.1";
