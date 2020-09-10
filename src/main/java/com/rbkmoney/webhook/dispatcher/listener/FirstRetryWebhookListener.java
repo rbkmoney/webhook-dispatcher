@@ -8,30 +8,25 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AcknowledgingMessageListener;
-import org.springframework.kafka.listener.ConsumerSeekAware;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ThirdRetryWebHookListener extends RetryConsumerSeekAware implements AcknowledgingMessageListener<String, WebhookMessage>, ConsumerSeekAware {
+public class FirstRetryWebhookListener extends RetryConsumerSeekAware implements AcknowledgingMessageListener<String, WebhookMessage> {
 
-    @Value("${retry.third.seconds}")
-    private long timeout;
     @Value("${retry.first.seconds}")
-    private long firstTimeout;
-    @Value("${retry.second.seconds}")
-    private long secondTimeout;
+    private long timeout;
 
-    @Value("${kafka.topic.webhook.last.retry}")
+    @Value("${kafka.topic.webhook.second.retry}")
     private String postponedTopic;
+
     private final RetryHandler handler;
 
-    @KafkaListener(topics = "${kafka.topic.webhook.third.retry}", containerFactory = "kafkaThirdRetryListenerContainerFactory")
+    @KafkaListener(topics = "${kafka.topic.webhook.first.retry}", containerFactory = "kafkaRetryListenerContainerFactory")
     public void onMessage(ConsumerRecord<String, WebhookMessage> consumerRecord, Acknowledgment acknowledgment) {
-        handler.handle(postponedTopic, acknowledgment, consumerRecord, timeout + firstTimeout + secondTimeout,
-                consumerSeekCallback);
+        handler.handle(postponedTopic, acknowledgment, consumerRecord, timeout, consumerSeekCallback);
     }
 
 }

@@ -2,26 +2,26 @@ package com.rbkmoney.webhook.dispatcher.handler;
 
 import com.rbkmoney.kafka.common.exception.RetryableException;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
+import com.rbkmoney.webhook.dispatcher.dao.WebhookDao;
 import com.rbkmoney.webhook.dispatcher.filter.DispatchFilter;
-import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
+import com.rbkmoney.webhook.dispatcher.service.WebhookDispatcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import static com.rbkmoney.webhook.dispatcher.utils.WebHookLogUtils.info;
-import static com.rbkmoney.webhook.dispatcher.utils.WebHookLogUtils.warn;
+import static com.rbkmoney.webhook.dispatcher.utils.WebhookLogUtils.info;
+import static com.rbkmoney.webhook.dispatcher.utils.WebhookLogUtils.warn;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class WebHookHandlerImpl implements WebHookHandler {
+public class WebhookHandlerImpl implements WebhookHandler {
 
-    private final WebHookDispatcherService webHookDispatcherService;
+    private final WebhookDispatcherService webhookDispatcherService;
     private final DispatchFilter postponedDispatchFilter;
     private final DispatchFilter deadRetryDispatchFilter;
-    private final WebHookDao webHookDao;
+    private final WebhookDao webhookDao;
     private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
 
     @Override
@@ -29,7 +29,7 @@ public class WebHookHandlerImpl implements WebHookHandler {
         try {
             if (deadRetryDispatchFilter.filter(webhookMessage)) {
                 warn("Retry time has ended for", webhookMessage);
-                webHookDao.bury(webhookMessage);
+                webhookDao.bury(webhookMessage);
             } else if (postponedDispatchFilter.filter(webhookMessage)) {
                 long retryCount = webhookMessage.getRetryCount();
                 webhookMessage.setRetryCount(++retryCount);
@@ -39,8 +39,8 @@ public class WebHookHandlerImpl implements WebHookHandler {
                 long retryCount = webhookMessage.getRetryCount();
                 webhookMessage.setRetryCount(++retryCount);
                 info("Dispatch", webhookMessage);
-                webHookDispatcherService.dispatch(webhookMessage);
-                webHookDao.commit(webhookMessage);
+                webhookDispatcherService.dispatch(webhookMessage);
+                webhookDao.commit(webhookMessage);
             }
         } catch (RetryableException e) {
             log.warn("RetryableException during webhook handling", e);

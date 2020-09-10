@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
-public class WebHookLogUtils {
+public class WebhookLogUtils {
 
     public static final String WEBHOOK_TEMPLATE = " sourceId: {} eventId: {} webhookId: {} parentEventId: {} createdAt: {} retryCount: {}  \n" +
             "url: {} \n" +

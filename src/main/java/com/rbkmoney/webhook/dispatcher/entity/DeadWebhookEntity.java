@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "dead_hooks")
-public class DeadHookEntity implements Serializable {
+@Table(name = "dead_webhooks")
+public class DeadWebhookEntity implements Serializable {
 
     @Id
     private String id;

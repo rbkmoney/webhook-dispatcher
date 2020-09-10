@@ -2,7 +2,6 @@ package com.rbkmoney.webhook.dispatcher.service;
 
 import com.rbkmoney.kafka.common.exception.RetryableException;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.utils.WebHookLogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -14,14 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WebHookDispatcherServiceImpl implements WebHookDispatcherService {
+public class WebhookDispatcherServiceImpl implements WebhookDispatcherService {
 
     private final CloseableHttpClient client;
 

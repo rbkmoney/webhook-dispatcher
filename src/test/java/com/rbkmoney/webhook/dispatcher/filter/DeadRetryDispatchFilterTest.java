@@ -1,7 +1,7 @@
 package com.rbkmoney.webhook.dispatcher.filter;
 
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
+import com.rbkmoney.webhook.dispatcher.dao.WebhookDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 public class DeadRetryDispatchFilterTest {
 
     @MockBean
-    private WebHookDao webHookDao;
+    private WebhookDao webhookDao;
 
     @Autowired
     private DeadRetryDispatchFilter dispatchFilter;
@@ -29,21 +29,21 @@ public class DeadRetryDispatchFilterTest {
     public void filter() {
         WebhookMessage webhookMessage = new WebhookMessage();
         webhookMessage.setCreatedAt(Instant.now().minusSeconds(60 * 60 * 24 + 1).toString());
-        when(webHookDao.isCommitted(webhookMessage)).thenReturn(true);
+        when(webhookDao.isCommitted(webhookMessage)).thenReturn(true);
         boolean filter = dispatchFilter.filter(webhookMessage);
 
         assertTrue(filter);
 
         webhookMessage = new WebhookMessage();
         webhookMessage.setCreatedAt(Instant.now().minusSeconds(60 * 60 * 24 + 1).toString());
-        when(webHookDao.isCommitted(webhookMessage)).thenReturn(false);
+        when(webhookDao.isCommitted(webhookMessage)).thenReturn(false);
         filter = dispatchFilter.filter(webhookMessage);
 
         assertTrue(filter);
 
         webhookMessage = new WebhookMessage();
         webhookMessage.setCreatedAt(Instant.now().minusSeconds(60 * 60 * 23).toString());
-        when(webHookDao.isCommitted(webhookMessage)).thenReturn(false);
+        when(webhookDao.isCommitted(webhookMessage)).thenReturn(false);
         filter = dispatchFilter.filter(webhookMessage);
 
         assertFalse(filter);

@@ -5,7 +5,7 @@ import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 
 import java.io.IOException;
 
-public interface WebHookDispatcherService {
+public interface WebhookDispatcherService {
 
     int dispatch(WebhookMessage webhookMessage) throws IOException;
 

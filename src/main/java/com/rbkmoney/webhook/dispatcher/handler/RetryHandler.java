@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RetryHandler {
 
-    private final WebHookHandlerImpl handler;
+    private final WebhookHandlerImpl handler;
     private final TimeDispatchFilter timeDispatchFilter;
 
     private static final long WAITING_PERIOD = 500L;

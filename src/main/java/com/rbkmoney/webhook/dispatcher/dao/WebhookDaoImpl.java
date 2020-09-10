@@ -3,11 +3,11 @@ package com.rbkmoney.webhook.dispatcher.dao;
 import com.rbkmoney.kafka.common.exception.RetryableException;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 import com.rbkmoney.webhook.dispatcher.converter.CommitLogConverter;
-import com.rbkmoney.webhook.dispatcher.converter.DeadHookConverter;
+import com.rbkmoney.webhook.dispatcher.converter.DeadWebhookConverter;
 import com.rbkmoney.webhook.dispatcher.entity.CommitLogEntity;
-import com.rbkmoney.webhook.dispatcher.entity.DeadHookEntity;
+import com.rbkmoney.webhook.dispatcher.entity.DeadWebhookEntity;
 import com.rbkmoney.webhook.dispatcher.repository.CommitLogRepository;
-import com.rbkmoney.webhook.dispatcher.repository.DeadHookRepository;
+import com.rbkmoney.webhook.dispatcher.repository.DeadWebhookRepository;
 import com.rbkmoney.webhook.dispatcher.utils.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WebHookDaoImpl implements WebHookDao {
+public class WebhookDaoImpl implements WebhookDao {
 
-    private final DeadHookConverter deadHookConverter;
-    private final DeadHookRepository deadHookRepository;
+    private final DeadWebhookConverter deadWebhookConverter;
+    private final DeadWebhookRepository deadWebhookRepository;
     private final CommitLogConverter commitLogConverter;
     private final CommitLogRepository commitLogRepository;
 
@@ -38,11 +38,11 @@ public class WebHookDaoImpl implements WebHookDao {
 
     @Override
     public void bury(WebhookMessage webhookMessage) {
-        DeadHookEntity deadHook = deadHookConverter.convert(webhookMessage);
+        DeadWebhookEntity deadHook = deadWebhookConverter.convert(webhookMessage);
 
         try {
             log.info("Bury webhook with id={}", deadHook.getId());
-            deadHookRepository.save(deadHook);
+            deadWebhookRepository.save(deadHook);
         } catch (Exception e) {
             log.error("Exception during burying webhook with id={}", deadHook.getId(), e);
             throw new RetryableException(e);

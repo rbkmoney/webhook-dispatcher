@@ -3,7 +3,7 @@ package com.rbkmoney.webhook.dispatcher.converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.entity.DeadHookEntity;
+import com.rbkmoney.webhook.dispatcher.entity.DeadWebhookEntity;
 import com.rbkmoney.webhook.dispatcher.utils.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -13,12 +13,12 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class DeadHookConverter {
+public class DeadWebhookConverter {
 
     private final ObjectMapper objectMapper;
 
-    public DeadHookEntity convert(WebhookMessage webhookMessage) {
-        return DeadHookEntity.builder()
+    public DeadWebhookEntity convert(WebhookMessage webhookMessage) {
+        return DeadWebhookEntity.builder()
                 .id(IdGenerator.generate(
                         webhookMessage.getWebhookId(),
                         webhookMessage.getSourceId(),

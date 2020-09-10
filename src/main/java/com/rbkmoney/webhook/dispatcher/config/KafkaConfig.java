@@ -2,7 +2,7 @@ package com.rbkmoney.webhook.dispatcher.config;
 
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.serde.WebHookDeserializer;
+import com.rbkmoney.webhook.dispatcher.serde.WebhookDeserializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -29,7 +29,7 @@ public class KafkaConfig {
 
     private static final String GROUP_ID = "WebHookDispatcherListener";
     private static final String EARLIEST = "earliest";
-    public static final String PKCS_12 = "PKCS12";
+    private static final String PKCS_12 = "PKCS12";
 
     @Value("${kafka.bootstrap.servers}")
     private String bootstrapServers;
@@ -68,7 +68,7 @@ public class KafkaConfig {
     @Bean
     public ConsumerFactory<String, WebhookMessage> consumerFactory() {
         Map<String, Object> configs = consumerConfigs();
-        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, WebHookDeserializer.class);
+        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, WebhookDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(configs);
     }
 

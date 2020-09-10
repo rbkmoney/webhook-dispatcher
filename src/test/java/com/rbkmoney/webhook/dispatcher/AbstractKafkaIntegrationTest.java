@@ -2,7 +2,7 @@ package com.rbkmoney.webhook.dispatcher;
 
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.webhook.dispatcher.dao.DaoTestBase;
-import com.rbkmoney.webhook.dispatcher.serde.WebHookDeserializer;
+import com.rbkmoney.webhook.dispatcher.serde.WebhookDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -60,7 +60,7 @@ public abstract class AbstractKafkaIntegrationTest extends DaoTestBase {
         }
 
         private <T> void initTopic(String topicName) {
-            Consumer<String, T> consumer = createConsumer(WebHookDeserializer.class);
+            Consumer<String, T> consumer = createConsumer(WebhookDeserializer.class);
             try {
                 consumer.subscribe(Collections.singletonList(topicName));
                 consumer.poll(Duration.ofMillis(100L));

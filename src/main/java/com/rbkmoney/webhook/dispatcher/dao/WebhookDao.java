@@ -2,7 +2,7 @@ package com.rbkmoney.webhook.dispatcher.dao;
 
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
 
-public interface WebHookDao {
+public interface WebhookDao {
 
     void commit(WebhookMessage webhookMessage);
 

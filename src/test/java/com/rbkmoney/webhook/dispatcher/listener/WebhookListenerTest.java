@@ -1,12 +1,12 @@
 package com.rbkmoney.webhook.dispatcher.listener;
 
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
+import com.rbkmoney.webhook.dispatcher.dao.WebhookDao;
 import com.rbkmoney.webhook.dispatcher.filter.DeadRetryDispatchFilter;
 import com.rbkmoney.webhook.dispatcher.filter.PostponedDispatchFilter;
-import com.rbkmoney.webhook.dispatcher.handler.WebHookHandlerImpl;
-import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
-import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherServiceImpl;
+import com.rbkmoney.webhook.dispatcher.handler.WebhookHandlerImpl;
+import com.rbkmoney.webhook.dispatcher.service.WebhookDispatcherService;
+import com.rbkmoney.webhook.dispatcher.service.WebhookDispatcherServiceImpl;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Before;
@@ -23,12 +23,12 @@ import java.util.HashMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class WebHookListenerTest {
+public class WebhookListenerTest {
 
-    private WebHookListener webHookListener;
+    private WebhookListener webhookListener;
 
     @Mock
-    private WebHookDao webHookDaoImpl;
+    private WebhookDao webhookDaoImpl;
     @Mock
     private KafkaTemplate<String, WebhookMessage> kafkaTemplate;
     @Mock
@@ -39,7 +39,7 @@ public class WebHookListenerTest {
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        WebHookDispatcherService webHookDispatcherService = new WebHookDispatcherServiceImpl(HttpClientBuilder.create()
+        WebhookDispatcherService webhookDispatcherService = new WebhookDispatcherServiceImpl(HttpClientBuilder.create()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setConnectTimeout(60000)
                         .setConnectionRequestTimeout(60000)
@@ -47,16 +47,16 @@ public class WebHookListenerTest {
                         .build())
                 .build());
 
-        webHookListener = new WebHookListener(
-                new WebHookHandlerImpl(
-                        webHookDispatcherService,
-                        new PostponedDispatchFilter(webHookDaoImpl),
-                        new DeadRetryDispatchFilter(webHookDaoImpl), webHookDaoImpl, kafkaTemplate));
+        webhookListener = new WebhookListener(
+                new WebhookHandlerImpl(
+                        webhookDispatcherService,
+                        new PostponedDispatchFilter(webhookDaoImpl),
+                        new DeadRetryDispatchFilter(webhookDaoImpl), webhookDaoImpl, kafkaTemplate));
     }
 
     @Test
     public void listen() {
-        when(webHookDaoImpl.isCommitted(any())).thenReturn(false);
+        when(webhookDaoImpl.isCommitted(any())).thenReturn(false);
         when(kafkaTemplate.send(any(), any(), any())).thenReturn(result);
 
         WebhookMessage webhookMessage = new WebhookMessage();
@@ -76,6 +76,6 @@ public class WebHookListenerTest {
         webhookMessage.setWebhookId(1L);
         webhookMessage.setRequestBody("{}".getBytes());
 
-        webHookListener.listen(webhookMessage, acknowledgment);
+        webhookListener.listen(webhookMessage, acknowledgment);
     }
 }
