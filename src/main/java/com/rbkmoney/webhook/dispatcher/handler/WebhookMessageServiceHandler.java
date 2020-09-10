@@ -1,6 +1,7 @@
 package com.rbkmoney.webhook.dispatcher.handler;
 
 import com.rbkmoney.webhook.dispatcher.WebhookMessageServiceSrv;
+import com.rbkmoney.webhook.dispatcher.WebhookNotFound;
 import com.rbkmoney.webhook.dispatcher.service.WebhookMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class WebhookMessageServiceHandler implements WebhookMessageServiceSrv.If
     public void resend(
             long webhookId,
             String sourceId,
-            long eventId) {
-        webhookMessageService.resend();
+            long eventId) throws WebhookNotFound {
+        webhookMessageService.resend(webhookId, sourceId, eventId);
     }
 }

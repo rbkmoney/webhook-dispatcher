@@ -25,7 +25,7 @@ public class WebhookDaoImpl implements WebhookDao {
 
     @Override
     public void commit(WebhookMessage webhookMessage) {
-        CommitLogEntity commitLog = commitLogConverter.convert(webhookMessage);
+        CommitLogEntity commitLog = commitLogConverter.toEntity(webhookMessage);
 
         try {
             log.info("Commit webhook with id={}", commitLog.getId());
@@ -38,7 +38,7 @@ public class WebhookDaoImpl implements WebhookDao {
 
     @Override
     public void bury(WebhookMessage webhookMessage) {
-        DeadWebhookEntity deadHook = deadWebhookConverter.convert(webhookMessage);
+        DeadWebhookEntity deadHook = deadWebhookConverter.toEntity(webhookMessage);
 
         try {
             log.info("Bury webhook with id={}", deadHook.getId());

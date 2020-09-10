@@ -11,7 +11,7 @@ import java.time.Instant;
 @Service
 public class CommitLogConverter {
 
-    public CommitLogEntity convert(WebhookMessage webhookMessage) {
+    public CommitLogEntity toEntity(WebhookMessage webhookMessage) {
         return CommitLogEntity.builder()
                 .id(IdGenerator.generate(
                         webhookMessage.getWebhookId(),
