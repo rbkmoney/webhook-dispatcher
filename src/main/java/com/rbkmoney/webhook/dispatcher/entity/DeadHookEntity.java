@@ -30,7 +30,7 @@ public class DeadHookEntity implements Serializable {
     private String url;
     private String contentType;
     private String additionalHeaders;
-    private Byte[] requestBody;
+    private byte[] requestBody;
     private Long retryCount;
 }
 
