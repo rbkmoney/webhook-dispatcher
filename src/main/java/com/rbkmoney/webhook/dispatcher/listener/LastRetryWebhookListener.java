@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class LastRetryWebHookListener
+public class LastRetryWebhookListener
         extends RetryConsumerSeekAware
         implements AcknowledgingMessageListener<String, WebhookMessage>, ConsumerSeekAware {
 
@@ -27,7 +27,7 @@ public class LastRetryWebHookListener
 
     private final RetryHandler handler;
 
-    public LastRetryWebHookListener(
+    public LastRetryWebhookListener(
             @Value("${kafka.topic.webhook.last.retry}") String postponedTopic,
             @Value("${retry.first.seconds}") long firstTimeout,
             @Value("${retry.second.seconds}") long secondTimeout,

@@ -1,4 +1,4 @@
-CREATE TABLE wb_dispatch.dead_hooks
+CREATE TABLE wb_dispatch.dead_webhooks
 (
     id                 CHARACTER VARYING(64)       NOT NULL,
     webhook_id         BIGINT                      NOT NULL,
@@ -11,5 +11,5 @@ CREATE TABLE wb_dispatch.dead_hooks
     additional_headers CHARACTER VARYING           NOT NULL,
     request_body       BYTEA                       NOT NULL,
     retry_count        BIGINT,
-    CONSTRAINT pk_dead_hooks PRIMARY KEY (id)
+    CONSTRAINT pk_dead_webhooks PRIMARY KEY (id)
 );

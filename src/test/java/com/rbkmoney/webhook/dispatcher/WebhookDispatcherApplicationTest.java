@@ -1,7 +1,7 @@
 package com.rbkmoney.webhook.dispatcher;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.rbkmoney.webhook.dispatcher.dao.WebHookDao;
+import com.rbkmoney.webhook.dispatcher.dao.WebhookDao;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Rule;
@@ -28,7 +28,7 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
     public static final String APPLICATION_JSON = "application/json";
 
     @Autowired
-    private WebHookDao webHookDao;
+    private WebhookDao webhookDao;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8089);
@@ -74,7 +74,7 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
 
         Thread.sleep(4500L);
 
-        assertFalse(webHookDao.isParentCommitted(webhook));
+        assertFalse(webhookDao.isParentCommitted(webhook));
 
     }
 

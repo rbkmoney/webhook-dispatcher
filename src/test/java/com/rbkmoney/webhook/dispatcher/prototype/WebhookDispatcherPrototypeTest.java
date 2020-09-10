@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 
-public class WebHookDispatcherPrototypeTest {
+public class WebhookDispatcherPrototypeTest {
 
     LinkedBlockingQueue<Model> forwardQueue = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<Model> firstRetryQueue = new LinkedBlockingQueue<>();

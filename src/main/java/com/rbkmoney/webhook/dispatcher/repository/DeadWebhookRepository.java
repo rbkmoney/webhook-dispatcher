@@ -1,9 +1,9 @@
 package com.rbkmoney.webhook.dispatcher.repository;
 
-import com.rbkmoney.webhook.dispatcher.entity.DeadHookEntity;
+import com.rbkmoney.webhook.dispatcher.entity.DeadWebhookEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DeadHookRepository extends JpaRepository<DeadHookEntity, String> {
+public interface DeadWebhookRepository extends JpaRepository<DeadWebhookEntity, String> {
 }

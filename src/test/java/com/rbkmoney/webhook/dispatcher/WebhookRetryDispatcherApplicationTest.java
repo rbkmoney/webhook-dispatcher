@@ -1,7 +1,7 @@
 package com.rbkmoney.webhook.dispatcher;
 
 import com.rbkmoney.kafka.common.exception.RetryableException;
-import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
+import com.rbkmoney.webhook.dispatcher.service.WebhookDispatcherService;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Test;
@@ -35,11 +35,11 @@ public class WebhookRetryDispatcherApplicationTest extends AbstractKafkaIntegrat
     private static final String APPLICATION_JSON = "application/json";
 
     @MockBean
-    private WebHookDispatcherService webHookDispatcherService;
+    private WebhookDispatcherService webhookDispatcherService;
 
     @Test
     public void listenCreatedTimeout() throws ExecutionException, InterruptedException, IOException {
-        when(webHookDispatcherService.dispatch(any())).thenThrow(RetryableException.class);
+        when(webhookDispatcherService.dispatch(any())).thenThrow(RetryableException.class);
 
         String sourceId = "123";
         WebhookMessage webhook = createWebhook(sourceId, Instant.now().toString(), 0);
@@ -51,7 +51,7 @@ public class WebhookRetryDispatcherApplicationTest extends AbstractKafkaIntegrat
 
         Thread.sleep(20000L);
 
-        verify(webHookDispatcherService, times(7)).dispatch(any());
+        verify(webhookDispatcherService, times(7)).dispatch(any());
     }
 
     private WebhookMessage createWebhook(String sourceId, String createdAt, long eventId) {

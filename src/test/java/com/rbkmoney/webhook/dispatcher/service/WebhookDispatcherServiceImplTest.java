@@ -17,7 +17,7 @@ import java.util.HashMap;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
-public class WebHookDispatcherServiceImplTest {
+public class WebhookDispatcherServiceImplTest {
 
     private static final String ALG_RS_256 = "alg=RS256";
     private static final String DIGEST = "oOg_wGfM3esi5aAmu4fnik6DRISvusM2r99i7iyQapkL_5Q30riAD6jSr9LOearJea6053JjodQ7v" +
@@ -25,7 +25,7 @@ public class WebHookDispatcherServiceImplTest {
             "XBCvWggqORPpZ_6J1oNbh1QqEBC9CqDU94d8GthzqxH3V7nIPdpYmg8VxbR9k5SGXf8zbIDWxWMzVfKQF4B1B1CtO46loD70cmOX2kMl32" +
             "WJa_XSV8Ep1ajDnouLyxk4eN-F-Fb1XkUWUJPw0JkKAVhp2F4NxzQ==";
 
-    private WebHookDispatcherServiceImpl webHookDispatcherService;
+    private WebhookDispatcherServiceImpl webhookDispatcherService;
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8089);
@@ -37,7 +37,7 @@ public class WebHookDispatcherServiceImplTest {
                 .setConnectionRequestTimeout(1000)
                 .setSocketTimeout(1000).build();
         CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-        webHookDispatcherService = new WebHookDispatcherServiceImpl(httpClient);
+        webhookDispatcherService = new WebhookDispatcherServiceImpl(httpClient);
     }
 
 
@@ -56,7 +56,7 @@ public class WebHookDispatcherServiceImplTest {
         webhookMessage.setContentType(ContentType.APPLICATION_JSON.getMimeType());
         HashMap<String, String> additionalHeaders = new HashMap<>();
         webhookMessage.setAdditionalHeaders(additionalHeaders);
-        webHookDispatcherService.dispatch(webhookMessage);
+        webhookDispatcherService.dispatch(webhookMessage);
     }
 
     @Test
@@ -78,6 +78,6 @@ public class WebHookDispatcherServiceImplTest {
         additionalHeaders.put("Content-Signature", ALG_RS_256);
         additionalHeaders.put("digest", DIGEST);
         webhookMessage.setAdditionalHeaders(additionalHeaders);
-        webHookDispatcherService.dispatch(webhookMessage);
+        webhookDispatcherService.dispatch(webhookMessage);
     }
 }

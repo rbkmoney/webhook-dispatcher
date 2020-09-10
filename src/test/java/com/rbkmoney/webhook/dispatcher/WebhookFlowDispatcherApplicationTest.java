@@ -1,6 +1,6 @@
 package com.rbkmoney.webhook.dispatcher;
 
-import com.rbkmoney.webhook.dispatcher.service.WebHookDispatcherService;
+import com.rbkmoney.webhook.dispatcher.service.WebhookDispatcherService;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Test;
@@ -36,11 +36,11 @@ public class WebhookFlowDispatcherApplicationTest extends AbstractKafkaIntegrati
     private static final String SOURCE_ID = "23";
 
     @MockBean
-    private WebHookDispatcherService webHookDispatcherService;
+    private WebhookDispatcherService webhookDispatcherService;
 
     @Test
     public void listenCreatedTimeout() throws ExecutionException, InterruptedException, IOException {
-        when(webHookDispatcherService.dispatch(any())).thenReturn(200);
+        when(webhookDispatcherService.dispatch(any())).thenReturn(200);
 
         String sourceId = "123";
         WebhookMessage webhook = createWebhook(sourceId, Instant.now().toString(), 0);
@@ -52,10 +52,10 @@ public class WebhookFlowDispatcherApplicationTest extends AbstractKafkaIntegrati
         producer.send(producerRecord).get();
         producer.close();
         Thread.sleep(4000L);
-        verify(webHookDispatcherService, times(1)).dispatch(any());
+        verify(webhookDispatcherService, times(1)).dispatch(any());
 
         //check waiting parent
-        Mockito.clearInvocations(webHookDispatcherService);
+        Mockito.clearInvocations(webhookDispatcherService);
         producer = createProducer();
         webhook.setParentEventId(0);
         webhook.setEventId(1);
@@ -64,7 +64,7 @@ public class WebhookFlowDispatcherApplicationTest extends AbstractKafkaIntegrati
         producer.send(producerRecord).get();
 
         Thread.sleep(2000L);
-        verify(webHookDispatcherService, times(0)).dispatch(any());
+        verify(webhookDispatcherService, times(0)).dispatch(any());
         webhook.setParentEventId(-1);
         webhook.setEventId(0);
         producerRecord = new ProducerRecord<>(Initializer.WEBHOOK_FORWARD, webhook.source_id, webhook);
@@ -72,7 +72,7 @@ public class WebhookFlowDispatcherApplicationTest extends AbstractKafkaIntegrati
 
         Thread.sleep(4000L);
 
-        verify(webHookDispatcherService, times(2)).dispatch(any());
+        verify(webhookDispatcherService, times(2)).dispatch(any());
     }
 
     private WebhookMessage createWebhook(String sourceId, String createdAt, long eventId) {
