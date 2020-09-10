@@ -1,10 +1,10 @@
 package com.rbkmoney.webhook.dispatcher.utils;
 
-public class KeyGenerator {
+public class IdGenerator {
 
     private static final String DELIMITER = "_";
 
-    public static String generateKey(Long hookId, String sourceId, long eventId) {
+    public static String generate(Long hookId, String sourceId, long eventId) {
         return hookId + DELIMITER + sourceId + DELIMITER + eventId;
     }
 

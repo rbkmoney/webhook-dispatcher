@@ -2,85 +2,76 @@ package com.rbkmoney.webhook.dispatcher.dao;
 
 import com.rbkmoney.kafka.common.exception.RetryableException;
 import com.rbkmoney.webhook.dispatcher.WebhookMessage;
-import com.rbkmoney.webhook.dispatcher.converter.WebhookMessageConverter;
-import com.rbkmoney.webhook.dispatcher.utils.KeyGenerator;
+import com.rbkmoney.webhook.dispatcher.converter.CommitLogConverter;
+import com.rbkmoney.webhook.dispatcher.converter.DeadHookConverter;
+import com.rbkmoney.webhook.dispatcher.entity.CommitLogEntity;
+import com.rbkmoney.webhook.dispatcher.entity.DeadHookEntity;
+import com.rbkmoney.webhook.dispatcher.repository.CommitLogRepository;
+import com.rbkmoney.webhook.dispatcher.repository.DeadHookRepository;
+import com.rbkmoney.webhook.dispatcher.utils.IdGenerator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.stereotype.Service;
-
-import javax.sql.DataSource;
 
 @Slf4j
 @Service
-public class WebHookDaoImpl extends NamedParameterJdbcDaoSupport implements WebHookDao {
+@RequiredArgsConstructor
+public class WebHookDaoImpl implements WebHookDao {
 
-    private static final String ID = "id";
-
-    private final WebhookMessageConverter webhookMessageConverter;
-
-    public WebHookDaoImpl(
-            DataSource ds,
-            WebhookMessageConverter webhookMessageConverter) {
-        setDataSource(ds);
-        this.webhookMessageConverter = webhookMessageConverter;
-    }
+    private final DeadHookConverter deadHookConverter;
+    private final DeadHookRepository deadHookRepository;
+    private final CommitLogConverter commitLogConverter;
+    private final CommitLogRepository commitLogRepository;
 
     @Override
     public void commit(WebhookMessage webhookMessage) {
-        String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
+        CommitLogEntity commitLog = commitLogConverter.convert(webhookMessage);
 
         try {
-            log.info("Commit webhook with key={}", key);
-            String sqlQuery = "INSERT INTO wb_dispatch.commit_log(id) VALUES (?)";
-            getJdbcTemplate().update(sqlQuery, key);
+            log.info("Commit webhook with id={}", commitLog.getId());
+            commitLogRepository.save(commitLog);
         } catch (Exception e) {
-            log.error("Exception during committing webhook with key={}", key, e);
+            log.error("Exception during committing webhook with id={}", commitLog.getId(), e);
             throw new RetryableException(e);
         }
     }
 
     @Override
     public void bury(WebhookMessage webhookMessage) {
-        String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
+        DeadHookEntity deadHook = deadHookConverter.convert(webhookMessage);
 
         try {
-            log.info("Bury webhook with key={}", key);
-            String sqlQuery = "INSERT INTO wb_dispatch.dead_hooks(id, webhook_id, source_id, event_id, parent_event_id, " +
-                    "created_at, url, content_type, additional_headers, request_body, retry_count) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            MapSqlParameterSource params = webhookMessageConverter.convert(webhookMessage, key);
-            getNamedParameterJdbcTemplate().update(sqlQuery, params);
+            log.info("Bury webhook with id={}", deadHook.getId());
+            deadHookRepository.save(deadHook);
         } catch (Exception e) {
-            log.error("Exception during burying webhook with key={}", key, e);
+            log.error("Exception during burying webhook with id={}", deadHook.getId(), e);
             throw new RetryableException(e);
         }
     }
 
     @Override
     public Boolean isParentCommitted(WebhookMessage webhookMessage) {
-        String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getParentEventId());
-        return checkIsCommit(webhookMessage, key);
+        return isCommitted(IdGenerator.generate(
+                webhookMessage.getWebhookId(),
+                webhookMessage.getSourceId(),
+                webhookMessage.getParentEventId()));
     }
 
     @Override
     public Boolean isCommitted(WebhookMessage webhookMessage) {
-        String key = KeyGenerator.generateKey(webhookMessage.getWebhookId(), webhookMessage.getSourceId(), webhookMessage.getEventId());
-        return checkIsCommit(webhookMessage, key);
+        return isCommitted(IdGenerator.generate(
+                webhookMessage.getWebhookId(),
+                webhookMessage.getSourceId(),
+                webhookMessage.getEventId()));
     }
 
-    private Boolean checkIsCommit(WebhookMessage webhookMessage, String key) {
+    private Boolean isCommitted(String id) {
         try {
-            String sqlQuery = "SELECT EXISTS (" +
-                    "SELECT * FROM wb_dispatch.commit_log WHERE id = :id" +
-                    ")";
-            MapSqlParameterSource params = new MapSqlParameterSource(ID, key);
-            Boolean isExist = getNamedParameterJdbcTemplate().queryForObject(sqlQuery, params, Boolean.class);
-            log.info("Row for source_id={}, hook_id={} with key={} is already exists: {}",
-                    webhookMessage.getSourceId(), webhookMessage.getWebhookId(), key, isExist);
-            return isExist;
+            Boolean isCommitted = commitLogRepository.existsById(id);
+            log.info("Webhook with id={}: isCommitted={}", id, isCommitted);
+            return isCommitted;
         } catch (Exception e) {
-            log.error("Exception during looking for parent event with key={}", key, e);
+            log.error("Exception during looking for parent event with id={}", id, e);
             throw new RetryableException(e);
         }
     }
