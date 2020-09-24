@@ -106,7 +106,7 @@ public class KafkaConfig {
     private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> createFactory(ConsumerFactory<String, WebhookMessage> consumerFactory, int concurrency) {
         ConcurrentKafkaListenerContainerFactory<String, WebhookMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
-        factory.setErrorHandler(new SeekToCurrentErrorHandler(new FixedBackOff(RetryHandler.WAITING_PERIOD, 3)));
+        factory.setErrorHandler(new SeekToCurrentErrorHandler());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         factory.setConcurrency(concurrency);
         return factory;
