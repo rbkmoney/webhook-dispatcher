@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SecondRetryWebhookListener extends RetryConsumerSeekAware implements AcknowledgingMessageListener<String, WebhookMessage>, ConsumerSeekAware {
+public class SecondRetryWebhookListener implements AcknowledgingMessageListener<String, WebhookMessage>, ConsumerSeekAware {
 
     @Value("${retry.second.seconds}")
     private long timeout;
@@ -30,7 +30,7 @@ public class SecondRetryWebhookListener extends RetryConsumerSeekAware implement
 
     @KafkaListener(topics = "${kafka.topic.webhook.second.retry}", containerFactory = "kafkaSecondRetryListenerContainerFactory")
     public void onMessage(ConsumerRecord<String, WebhookMessage> consumerRecord, Acknowledgment acknowledgment) {
-        handler.handle(postponedTopic, acknowledgment, consumerRecord, timeout + prevTimeout, consumerSeekCallback);
+        handler.handle(postponedTopic, acknowledgment, consumerRecord, timeout + prevTimeout);
     }
 
 }
