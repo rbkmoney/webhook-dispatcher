@@ -87,9 +87,6 @@ public class LastRetryWebhookListenerTest {
         ConsumerRecord<String, WebhookMessage> consumerRecord1 = new ConsumerRecord<>(
                 "key", 0, 0, "d", webhookMessage);
         lastRetryWebhookListener.onMessage(consumerRecord1, acknowledgment);
-
-        verify(consumerSeekCallback, times(1))
-                .seek(consumerRecord1.topic(), consumerRecord1.partition(), consumerRecord1.offset());
     }
 
 }

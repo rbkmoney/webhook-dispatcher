@@ -17,36 +17,24 @@ public class RetryHandler {
     private final WebhookHandlerImpl handler;
     private final TimeDispatchFilter timeDispatchFilter;
 
-    private static final long WAITING_PERIOD = 500L;
+    public static final long WAITING_PERIOD = 500L;
 
     public void handle(
             String topic,
             Acknowledgment acknowledgment,
             ConsumerRecord<String, WebhookMessage> consumerRecord,
-            Long timeout,
-            ThreadLocal<ConsumerSeekAware.ConsumerSeekCallback> consumerSeekCallback) {
+            Long timeout) {
         WebhookMessage webhookMessage = consumerRecord.value();
-
         if (timeDispatchFilter.filter(webhookMessage, timeout)) {
             handler.handle(topic, webhookMessage);
             acknowledgment.acknowledge();
         } else {
             try {
-                consumerSeekCallback.get().seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
-                safeSleep();
+                acknowledgment.nack(WAITING_PERIOD);
                 log.debug("Waiting timeout: {}", timeout);
             } catch (Exception e) {
                 log.warn("Exception during seek aware", e);
             }
-        }
-    }
-
-    private void safeSleep() {
-        try {
-            Thread.sleep(WAITING_PERIOD);
-        } catch (InterruptedException e) {
-            log.warn("InterruptedException during sleep", e);
-            Thread.currentThread().interrupt();
         }
     }
 
