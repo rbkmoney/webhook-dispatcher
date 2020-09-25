@@ -72,8 +72,8 @@ kafka:
 
 merchant:
   timeout: 10000
-  max.per.route: 2
-  max.total: 40
+  max.per.route: 20
+  max.total: 1000
 
 retry:
   first.seconds: 30
