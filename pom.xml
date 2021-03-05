@@ -6,25 +6,24 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.2.RELEASE</version>
+        <version>2.3.8</version>
     </parent>
 
     <artifactId>webhook-dispatcher</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>webhook-dispatcher</name>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
         <server.port>8022</server.port>
-        <exposed.ports>${server.port}</exposed.ports>
-        <dockerfile.base.service.tag>57e26d8ee999d7b0b50248c22afc63e6f926d276</dockerfile.base.service.tag>
-        <dockerfile.registry>dr2.rbkmoney.com</dockerfile.registry>
+        <management.port>8023</management.port>
+        <exposed.ports>${server.port} ${management.port}</exposed.ports>
+        <dockerfile.base.service.tag>c0612d6052ac049496b72a23a04acb142035f249</dockerfile.base.service.tag>
+        <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
         <kafka.clients.version>2.3.0</kafka.clients.version>
-        <shared.resources.version>0.3.6</shared.resources.version>
+        <shared.resources.version>0.3.8</shared.resources.version>
         <kafka.common.lib.version>0.0.8</kafka.common.lib.version>
         <webhook-dispatcher-proto.version>1.10-39f3bb5</webhook-dispatcher-proto.version>
 
@@ -36,16 +35,14 @@
         <db.password>postgres</db.password>
         <db.schema>wb_dispatch</db.schema>
         <db.common.lib.version>0.0.1-SNAPSHOT</db.common.lib.version>
-        <flyway.version>5.2.3</flyway.version>
-
     </properties>
 
     <dependencies>
         <!--rbkmoney-->
         <dependency>
             <groupId>com.rbkmoney</groupId>
-            <artifactId>spring-boot-starter-metrics-statsd</artifactId>
-            <version>1.1.0</version>
+            <artifactId>custom-metrics-spring-boot-starter</artifactId>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.woody</groupId>
@@ -75,7 +72,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>custom-actuator-endpoints</artifactId>
-            <version>0.0.3</version>
+            <version>0.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
@@ -108,6 +105,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
 
         <!--third party-->
         <dependency>
@@ -118,7 +119,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.4</version>
+            <version>${lombok.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -235,23 +236,6 @@
                     <execution>
                         <goals>
                             <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.2</version>
-                <configuration>
-                    <destFile>${sonar.jacoco.reportPath}</destFile>
-                    <append>true</append>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                 </executions>
