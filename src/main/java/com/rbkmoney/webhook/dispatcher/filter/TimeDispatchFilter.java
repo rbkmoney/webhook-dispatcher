@@ -10,7 +10,8 @@ import java.util.concurrent.TimeUnit;
 public class TimeDispatchFilter {
 
     public boolean filter(WebhookMessage webhookMessage, long timeout) {
-        return TimeoutUtils.calculateTimeFromCreated(webhookMessage.getCreatedAt()) > TimeUnit.SECONDS.toMillis(timeout);
+        return TimeoutUtils.calculateTimeFromCreated(webhookMessage.getCreatedAt()) >
+                TimeUnit.SECONDS.toMillis(timeout);
     }
 
 }

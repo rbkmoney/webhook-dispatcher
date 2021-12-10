@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class LastRetryWebhookListener implements AcknowledgingMessageListener<String, WebhookMessage>, ConsumerSeekAware {
+public class LastRetryWebhookListener
+        implements AcknowledgingMessageListener<String, WebhookMessage>, ConsumerSeekAware {
 
     private static final int COUNT_FIRST_RETRIES = 3;
 
@@ -40,7 +41,8 @@ public class LastRetryWebhookListener implements AcknowledgingMessageListener<St
         this.handler = handler;
     }
 
-    @KafkaListener(topics = "${kafka.topic.webhook.last.retry}", containerFactory = "kafkaLastRetryListenerContainerFactory")
+    @KafkaListener(topics = "${kafka.topic.webhook.last.retry}",
+            containerFactory = "kafkaLastRetryListenerContainerFactory")
     public void onMessage(ConsumerRecord<String, WebhookMessage> consumerRecord, Acknowledgment acknowledgment) {
         long retryCount = initRetryCount(consumerRecord.value());
         handler.handle(postponedTopic, acknowledgment, consumerRecord, initTimeout(retryCount));

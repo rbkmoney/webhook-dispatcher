@@ -16,15 +16,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FirstRetryWebhookListener implements AcknowledgingMessageListener<String, WebhookMessage> {
 
+    private final RetryHandler handler;
     @Value("${retry.first.seconds}")
     private long timeout;
-
     @Value("${kafka.topic.webhook.second.retry}")
     private String postponedTopic;
 
-    private final RetryHandler handler;
-
-    @KafkaListener(topics = "${kafka.topic.webhook.first.retry}", containerFactory = "kafkaRetryListenerContainerFactory")
+    @KafkaListener(topics = "${kafka.topic.webhook.first.retry}",
+            containerFactory = "kafkaRetryListenerContainerFactory")
     public void onMessage(ConsumerRecord<String, WebhookMessage> consumerRecord, Acknowledgment acknowledgment) {
         handler.handle(postponedTopic, acknowledgment, consumerRecord, timeout);
     }

@@ -5,7 +5,6 @@ import com.rbkmoney.webhook.dispatcher.filter.TimeDispatchFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.kafka.listener.ConsumerSeekAware;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +13,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RetryHandler {
 
+    public static final long WAITING_PERIOD = 500L;
     private final WebhookHandlerImpl handler;
     private final TimeDispatchFilter timeDispatchFilter;
-
-    public static final long WAITING_PERIOD = 500L;
 
     public void handle(
             String topic,

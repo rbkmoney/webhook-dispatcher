@@ -9,5 +9,5 @@ public class WebhookDeserializer extends AbstractThriftDeserializer<WebhookMessa
     public WebhookMessage deserialize(String s, byte[] bytes) {
         return super.deserialize(bytes, new WebhookMessage());
     }
-    
+
 }
