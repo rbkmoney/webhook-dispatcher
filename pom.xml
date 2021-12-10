@@ -12,7 +12,6 @@
     <artifactId>webhook-dispatcher</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>webhook-dispatcher</name>
 
     <properties>
