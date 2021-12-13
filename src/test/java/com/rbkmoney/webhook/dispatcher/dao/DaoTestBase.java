@@ -27,9 +27,10 @@ import java.util.function.Consumer;
 @ContextConfiguration(classes = {DataSourceAutoConfiguration.class}, initializers = DaoTestBase.Initializer.class)
 public abstract class DaoTestBase extends AbstractTestUtils {
 
-    private static final TestContainers POSTGRES = TestContainersBuilder.builderWithTestContainers(TestContainersParameters::new)
-            .addPostgresqlTestContainer()
-            .build();
+    private static final TestContainers POSTGRES =
+            TestContainersBuilder.builderWithTestContainers(TestContainersParameters::new)
+                    .addPostgresqlTestContainer()
+                    .build();
 
     @ClassRule
     public static final FailureDetectingExternalResource resource = new FailureDetectingExternalResource() {
@@ -50,6 +51,18 @@ public abstract class DaoTestBase extends AbstractTestUtils {
         }
     };
 
+    private static Consumer<EnvironmentProperties> getEnvironmentPropertiesConsumer() {
+        return environmentProperties -> {
+            PostgreSQLContainer postgreSqlContainer = POSTGRES.getPostgresqlTestContainer().get();
+            environmentProperties.put("spring.datasource.url", postgreSqlContainer.getJdbcUrl());
+            environmentProperties.put("spring.datasource.username", postgreSqlContainer.getUsername());
+            environmentProperties.put("spring.datasource.password", postgreSqlContainer.getPassword());
+            environmentProperties.put("spring.flyway.url", postgreSqlContainer.getJdbcUrl());
+            environmentProperties.put("spring.flyway.user", postgreSqlContainer.getUsername());
+            environmentProperties.put("spring.flyway.password", postgreSqlContainer.getPassword());
+        };
+    }
+
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
         @Override
@@ -58,17 +71,5 @@ public abstract class DaoTestBase extends AbstractTestUtils {
                     .of(POSTGRES.getEnvironmentProperties(getEnvironmentPropertiesConsumer()))
                     .applyTo(configurableApplicationContext);
         }
-    }
-
-    private static Consumer<EnvironmentProperties> getEnvironmentPropertiesConsumer() {
-        return environmentProperties -> {
-            PostgreSQLContainer postgreSQLContainer = POSTGRES.getPostgresqlTestContainer().get();
-            environmentProperties.put("spring.datasource.url", postgreSQLContainer.getJdbcUrl());
-            environmentProperties.put("spring.datasource.username", postgreSQLContainer.getUsername());
-            environmentProperties.put("spring.datasource.password", postgreSQLContainer.getPassword());
-            environmentProperties.put("spring.flyway.url", postgreSQLContainer.getJdbcUrl());
-            environmentProperties.put("spring.flyway.user", postgreSQLContainer.getUsername());
-            environmentProperties.put("spring.flyway.password", postgreSQLContainer.getPassword());
-        };
     }
 }

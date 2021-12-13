@@ -74,37 +74,49 @@ public class KafkaConfig {
     }
 
     @Bean
+    @SuppressWarnings("LineLength")
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaListenerContainerFactory(
-            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.forward}") int concurrency) {
+            ConsumerFactory<String, WebhookMessage> consumerFactory,
+            @Value("${kafka.concurrency.forward}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
+    @SuppressWarnings("LineLength")
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaRetryListenerContainerFactory(
-            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.first.retry}") int concurrency) {
+            ConsumerFactory<String, WebhookMessage> consumerFactory,
+            @Value("${kafka.concurrency.first.retry}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
+    @SuppressWarnings("LineLength")
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaSecondRetryListenerContainerFactory(
-            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.second.retry}") int concurrency) {
+            ConsumerFactory<String, WebhookMessage> consumerFactory,
+            @Value("${kafka.concurrency.second.retry}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
+    @SuppressWarnings("LineLength")
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaThirdRetryListenerContainerFactory(
-            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.third.retry}") int concurrency) {
+            ConsumerFactory<String, WebhookMessage> consumerFactory,
+            @Value("${kafka.concurrency.third.retry}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
     @Bean
+    @SuppressWarnings("LineLength")
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> kafkaLastRetryListenerContainerFactory(
-            ConsumerFactory<String, WebhookMessage> consumerFactory, @Value("${kafka.concurrency.last.retry}") int concurrency) {
+            ConsumerFactory<String, WebhookMessage> consumerFactory,
+            @Value("${kafka.concurrency.last.retry}") int concurrency) {
         return createFactory(consumerFactory, concurrency);
     }
 
-    private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> createFactory(ConsumerFactory<String, WebhookMessage> consumerFactory, int concurrency) {
-        ConcurrentKafkaListenerContainerFactory<String, WebhookMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, WebhookMessage>> createFactory(
+            ConsumerFactory<String, WebhookMessage> consumerFactory, int concurrency) {
+        ConcurrentKafkaListenerContainerFactory<String, WebhookMessage> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setErrorHandler(new SeekToCurrentErrorHandler(new FixedBackOff(RetryHandler.WAITING_PERIOD, 3)));
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);

@@ -42,7 +42,8 @@ public class WebhookDispatcherPrototypeTest {
         Assertions.assertThat(commitMap.keySet()).containsExactly("11", "12", "13");
     }
 
-    private void iterateThreeMessage(LinkedBlockingQueue<Model> forwardQueue, LinkedBlockingQueue<Model> firstRetryQueue) throws InterruptedException {
+    private void iterateThreeMessage(LinkedBlockingQueue<Model> forwardQueue,
+                                     LinkedBlockingQueue<Model> firstRetryQueue) throws InterruptedException {
         Model event;
         for (int i = 0; i < 3; i++) {
             event = forwardQueue.poll();
@@ -58,7 +59,6 @@ public class WebhookDispatcherPrototypeTest {
         forwardQueue.put(new Model("1", 1));
         forwardQueue.put(new Model("1", 2));
         forwardQueue.put(new Model("1", 3));
-
 
 
         iterateThreeMessage(forwardQueue, firstRetryQueue);
@@ -106,14 +106,14 @@ public class WebhookDispatcherPrototypeTest {
         return commitMap.containsKey(event.id + parentSequence);
     }
 
+    interface RemoteClient {
+        Boolean invoke() throws TimeoutException;
+    }
+
     @AllArgsConstructor
     class Model {
         public String id;
         public int sequence;
-    }
-
-    interface RemoteClient {
-        Boolean invoke() throws TimeoutException;
     }
 
 }

@@ -31,12 +31,14 @@ public class WebhookDispatcherServiceImpl implements WebhookDispatcherService {
         webhookMessage.getAdditionalHeaders().forEach(post::addHeader);
         try (CloseableHttpResponse response = client.execute(post)) {
             int statusCode = response.getStatusLine().getStatusCode();
-            log.info("Response from hook: sourceId: {}, eventId: {}, code: {}; body: {}", webhookMessage.getSourceId(), webhookMessage.getEventId(),
+            log.info("Response from hook: sourceId: {}, eventId: {}, code: {}; body: {}", webhookMessage.getSourceId(),
+                    webhookMessage.getEventId(),
                     statusCode, EntityUtils.toString(response.getEntity(), "UTF-8"));
             if (HttpStatus.valueOf(statusCode).is2xxSuccessful()) {
                 return statusCode;
             } else {
-                log.warn("Timeout error when send webhook: {} statusCode: {} reason: {}", webhookMessage.getSourceId(), statusCode,
+                log.warn("Timeout error when send webhook: {} statusCode: {} reason: {}", webhookMessage.getSourceId(),
+                        statusCode,
                         response.getStatusLine().getReasonPhrase());
                 throw new RetryableException(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
             }

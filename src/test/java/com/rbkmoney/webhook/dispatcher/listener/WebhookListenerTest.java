@@ -65,10 +65,13 @@ public class WebhookListenerTest {
         webhookMessage.setSourceId("547839");
         HashMap<String, String> additionalHeaders = new HashMap<>();
         additionalHeaders.put("Content-Signature", "alg=RS256");
-        additionalHeaders.put("digest", "AKIYypDF5jWuNT4aO6OvsWNuzS7e1ztUEVmLwSwaq2Q4j2ckwVJxxz6L1nFQbWZr9Bh8p-hkuKf7Mh" +
-                "KZlOKLkhClzDseW-GpJpyhrGnzFHFO78dxbjB8Z82zC5CVJk8PZa-ZxZ2MvoQWTAsPPWVXxJ64A7_tgYiIrSZkjyROwraj1-MG0iRA" +
-                "_a9bkXiwRelNj8mZIv38PneVPl1UAwpMaGs7pQmwaBv-M64Jm8rTd80WiRdOkp8G_hwPQdFo9lOhOxtUk9K5SoBfjKXQ0Dku7X2TpK" +
-                "fTQxHfB1mqm9L8DkK0NXopowqtZI4UB7TTFUIOOSI3SGpv3hyC2uYeTvnJWw==");
+        additionalHeaders
+                .put("digest", "AKIYypDF5jWuNT4aO6OvsWNuzS7e1ztUEVmLwSwaq2Q4j2ckwVJxxz6L1nFQbWZr9Bh8p-hkuKf7Mh" +
+                        "KZlOKLkhClzDseW-GpJpyhrGnzFHFO78dxbjB8Z82zC5CVJk8PZa-ZxZ2MvoQWTAsPPWVXxJ64A7_tgYiIrSZkjy" +
+                        "ROwraj1-MG0iRA" +
+                        "_a9bkXiwRelNj8mZIv38PneVPl1UAwpMaGs7pQmwaBv-M64Jm8rTd80WiRdOkp8G_hwPQdFo9lOhOxtUk9K5SoBfjKX" +
+                        "Q0Dku7X2TpK" +
+                        "fTQxHfB1mqm9L8DkK0NXopowqtZI4UB7TTFUIOOSI3SGpv3hyC2uYeTvnJWw==");
         webhookMessage.setAdditionalHeaders(additionalHeaders);
         webhookMessage.setContentType("application/json");
         webhookMessage.setParentEventId(-1L);

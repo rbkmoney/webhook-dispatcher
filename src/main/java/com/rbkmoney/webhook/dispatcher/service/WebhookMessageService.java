@@ -19,12 +19,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class WebhookMessageService {
 
-    @Value("${kafka.topic.webhook.forward}")
-    private String forwardTopic;
-
     private final DeadWebhookRepository deadWebhookRepository;
     private final DeadWebhookConverter deadWebhookConverter;
     private final KafkaTemplate<String, WebhookMessage> kafkaTemplate;
+    @Value("${kafka.topic.webhook.forward}")
+    private String forwardTopic;
 
     public void resend(
             long webhookId,

@@ -26,12 +26,10 @@ public class WebhookDispatcherApplicationTest extends AbstractKafkaIntegrationTe
 
     public static final String URL = "http://localhost:8089";
     public static final String APPLICATION_JSON = "application/json";
-
-    @Autowired
-    private WebhookDao webhookDao;
-
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8089);
+    @Autowired
+    private WebhookDao webhookDao;
 
     @Test
     public void listenCreatedTimeout() throws ExecutionException, InterruptedException {
