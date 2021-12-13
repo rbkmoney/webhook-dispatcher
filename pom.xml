@@ -19,7 +19,7 @@
         <server.port>8022</server.port>
         <management.port>8023</management.port>
         <exposed.ports>${server.port} ${management.port}</exposed.ports>
-        <dockerfile.base.service.tag>57e26d8ee999d7b0b50248c22afc63e6f926d276</dockerfile.base.service.tag>
+        <dockerfile.base.service.tag>a9b8771e24a69101c9327d9501a30afb4c5cd685</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
         <webhook-dispatcher-proto.version>1.10-39f3bb5</webhook-dispatcher-proto.version>
 
